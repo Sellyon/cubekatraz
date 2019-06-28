@@ -227,8 +227,8 @@ app.use('/Unauthorized', function (req, res) {
 app.use(function (req, res) {
   	res.status(404).render('error404');
 })
-
-let BaseHTTPServer = app.listen(80,function() {
+var port = process.env.PORT || 8080;
+let BaseHTTPServer = app.listen(port,function() {
   	console.log('ok');
 });
 
