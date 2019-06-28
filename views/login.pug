@@ -1,0 +1,14 @@
+html
+  include includes/head.pug
+  body
+    block menu
+      include includes/navigation.pug
+  h1 Se connecter
+  form(action='/loginTreatment' method='post')
+    label(for='login') Identifiant :
+    input#name(type='text' name='user_login')
+    label(for='password') Mot de passe :
+    input#surname(type='password' name='user_password')
+    button(type='submit') Envoyer le message
+
+    p= message

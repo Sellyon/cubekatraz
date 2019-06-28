@@ -1,0 +1,154 @@
+html
+  include includes/head.pug
+  script(src='/socket.io/socket.io.js')
+  link(rel='stylesheet', type='text/css', href='css/lobby.css')
+  script.
+    'use strict';
+    window.document.addEventListener('DOMContentLoaded', function () {
+
+      // web socket stuff
+      var socket = io('http://192.168.1.20:8080/');
+
+      console.log(document.cookie)
+      socket.on('connect', function () {
+        console.log('Navigateur dit : Connecté au serveur');
+
+        var tchatForm = document.getElementById('tchatForm');
+        var antichamberEntrance = document.getElementById('AntichamberAdder');
+        var avatarSelector1 = document.getElementById('player1AvatarSelect');
+        var avatarSelector2 = document.getElementById('player2AvatarSelect');
+        var chat = document.getElementById('chatChild');
+        var avatarPlayer1 = document.getElementById('avatarPlayer1');
+        var avatarPlayer2 = document.getElementById('avatarPlayer2');
+        var slot1 = document.getElementById('player1InAntichamber');
+        var slot2 = document.getElementById('player2InAntichamber');
+        var parentChat = chat.parentNode;
+        var outOfAutoScroll = false;
+        var playerList = [];
+        var yourId;
+
+        // Chatbox scrollbar's tracking
+        parentChat.addEventListener('scroll', function(event){
+          if (parentChat.scrollTop !== parentChat.scrollHeight - parentChat.clientHeight){
+            outOfAutoScroll = true;
+          } else {
+            outOfAutoScroll = false;
+          }
+        });
+
+        socket.addEventListener('hereIsYourChallenger', function(data){
+          playerList = data.playerList;
+          avatarPlayer1.src = data.slot1.avatarSlot1;
+          avatarPlayer2.src = data.slot2.avatarSlot2;
+          slot1.text = data.slot1.status;
+          slot2.text = data.slot2.status;
+          console.log(playerList);
+        });
+
+        socket.addEventListener('userDisconnected', function(data){
+          playerList = data;
+          console.log(playerList);
+        });
+
+
+        socket.emit('serverChatNeedTexts', 'Need chat texts please');
+
+        // Tchat management
+        tchatForm.addEventListener('submit', function (evt) {
+          evt.preventDefault();
+        });
+
+        socket.addEventListener('serverGiveChatTexts', function(messageList){          
+          for (let i = 0; i < messageList.length; i++) {
+            var ArchivedMessage = messageList[i].author + ' : ' + messageList[i].message;
+            var newTextP = document.createElement("p");
+            var newContent = document.createTextNode(ArchivedMessage);
+            newTextP.appendChild(newContent);
+            parentChat.insertBefore(newTextP, parentChat.childNodes[parentChat.childNodes.length]);
+          }
+
+          var newTextP = document.createElement('p');
+          var newContent = document.createTextNode('***** Bienvenu sur le tchat !{message} ! *****');
+          newTextP.appendChild(newContent);
+          parentChat.insertBefore(newTextP, parentChat.childNodes[parentChat.childNodes.length]);
+
+          outOfAutoScroll = true;
+          parentChat.scrollTop = parentChat.scrollHeight - parentChat.clientHeight;
+
+          tchatForm.addEventListener('submit', function (evt) {
+            var author = '!{message}';
+            var textToGet = evt.srcElement[0].value;
+            if (textToGet !== '') {
+              socket.emit('chatTextSubmitted', {
+                message: textToGet,
+                author: author,
+                date: Date.now()
+              });
+            }
+          });
+          
+
+          socket.addEventListener('chatTextDispatched', function(data){
+            console.log(data);
+            var message = data.author + ' : ' + data.message;
+            var newTextP = document.createElement("p");
+            var newContent = document.createTextNode(message);
+            newTextP.appendChild(newContent);
+            parentChat.insertBefore(newTextP, parentChat.childNodes[parentChat.childNodes.length]);
+            if (!outOfAutoScroll) {
+              parentChat.scrollTop = parentChat.scrollHeight - parentChat.clientHeight;
+            }
+          });
+        });
+
+        // Join antichamber
+        antichamberEntrance.addEventListener('click', function (evt) {
+          evt.preventDefault();
+          socket.emit('antichamberChangeNav');
+        });
+
+        socket.addEventListener('antichamberChangeServ', function(data){
+          console.log(data);
+          avatarPlayer1.src = '/images/portraits/' + data.slot1.image;
+          avatarPlayer2.src = '/images/portraits/' + data.slot2.image;
+          slot1.text = data.slot1.status;
+          slot2.text = data.slot2.status;
+        });
+      });
+    });
+  body
+    block menu
+      include includes/navigation.pug
+    h2
+      | Bienvenue 
+      a= message
+      |  au quartier disciplinaire !
+    p
+      | Ici vous pourrez échapper à la surveillance des gardiens et former des duos et planifier votre évasion.
+      br
+      | Commencez par rejoindre la salle d'attente
+    h2
+      | Salle d'attente
+    p
+      | Lorsque deux prisonniers sont dans la salle d'attente ils peuvent tenter une évasion.
+    button#AntichamberAdder(name='button') Rejoindre partie
+    div#slotPlayer1
+      p
+        | joueur 1 : 
+        a#player1InAntichamber
+    button#player1AvatarSelect(name='button') >
+    img#avatarPlayer1(src='', alt='player 1 portrait' width=200 height= 200)
+    div#slotPlayer2
+      p
+        | joueur 2 : 
+        a#player2InAntichamber
+    button#player2AvatarSelect(name='button') >
+    img#avatarPlayer2(src='', alt='player 2 portrait' width=200 height= 200)
+
+    div#chatBox
+      span#chatChild
+    form#tchatForm(action='/test', method='post')
+      div
+        label(for='msg') Message :
+        textarea#msg(name='message')
+        input(type='submit', value='envoyer')

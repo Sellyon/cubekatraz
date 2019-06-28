@@ -1,0 +1,31 @@
+html
+  include includes/head.pug
+  body
+    include includes/navigation.pug
+    block content
+    h1= titleprofil
+    h2
+      | Présentation
+    img(src=avatar)
+    p= description
+    h2
+      | Statistiques
+    p
+      | Meilleur score : 
+      a= bestScore
+      br
+      | Nombre de parties : 
+      a= matchPlayed
+      br
+      | Nombre de victoires : 
+      a= gameFinished
+      br
+      | Meilleur temps : 
+      a= bestTime
+    h2
+      | Amis :
+    ul
+      each friend , index in friends
+        li
+          a(href='/profil/' + friend)= friend
+    block options

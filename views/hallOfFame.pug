@@ -1,0 +1,30 @@
+html
+  include includes/head.pug
+  body
+    include includes/navigation.pug
+    block content
+    h1
+      | Le panthéon
+
+    p
+      | Ici est entretenue la mémoire des héros qui ont marqué l'histoire de Cubekatraz.
+    h2
+      | Les meilleurs duos
+    each duo , index in data
+        ul
+          li
+            | Joueur 1 : 
+            a= duo.player1
+          li
+            | Joueur 2 : 
+            a= duo.player2
+          li
+            | Score du groupe : 
+            a= duo.score
+          li
+            | Victoire du groupe : 
+            a= duo.victory
+          li
+            | Temps écoulé : 
+            a= duo.time
+            p= "Partie faite le " + duo.date

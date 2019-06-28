@@ -1,0 +1,21 @@
+[{
+	"player1" : "Sellyon",
+	"player2" : "Fanta",
+	"score" : 50,
+	"victory" : false,
+	"time" : 300000
+},
+{
+	"player1" : "Sellyon",
+	"player2" : "Fanta",
+	"score" : 60,
+	"victory" : false,
+	"time" : 350000
+},
+{
+	"player1" : "Sellyon",
+	"player2" : "Fanta",
+	"score" : 75,
+	"victory" : true,
+	"time" : 400000
+}]
