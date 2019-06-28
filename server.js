@@ -228,7 +228,7 @@ app.use(function (req, res) {
   	res.status(404).render('error404');
 })
 
-let BaseHTTPServer = app.listen(8080,function() {
+let BaseHTTPServer = app.listen(80,function() {
   	console.log('ok');
 });
 
