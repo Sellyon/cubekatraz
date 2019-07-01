@@ -2,8 +2,8 @@
 window.document.addEventListener('DOMContentLoaded', function () {
 
 	// web socket stuff
-    //var socket = io('https://two-prisoners.herokuapp.com/');
-    var socket = io('localhost:8080');
+    var socket = io('https://two-prisoners.herokuapp.com/');
+    //var socket = io('localhost:8080');
 
     socket.on('connect', function () {
     	console.log('Navigateur dit : Connecté au serveur');
