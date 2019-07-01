@@ -314,7 +314,6 @@ let initiateEvasionCountDown = function () {
 				countDownForbidden = false;
 				countDownStarted = false;
 				if (countDownValue <= 0) {
-					console.log('instance creation : ');
 					instancesList.push({
 						player1Id: avatarSlot1.status,
 						player1Name: avatarSlot1.name,
@@ -327,12 +326,14 @@ let initiateEvasionCountDown = function () {
 						level: 1,
 						active: true
 					});
+					instancesList[instancesList.length - 1].rules = instanceGenerator(instancesList.length - 1);
 					var destination = '/game/' + instancesList.length;
 					serverSocketIO.emit('redirectToGameInstance', {
 						url: destination,
 						player1: avatarSlot1.name,
 						player2: avatarSlot2.name
 					});
+					console.log('instance creation : ' + instancesList.length);
 				}
 			} else {
 				serverSocketIO.emit('updateEvasionCountDownBack', countDownText);
@@ -572,7 +573,221 @@ const instanceRegex = /\d+$/i;
 const instancesList = [];
 
 const instanceGenerator = function (instanceId) {
+	let rules = 'ERROR RULES NOT CORRECTLY GENERATED !';
+	if (instancesList[instanceId].level === 1) {
+		rules = {
+			levelStarted: false,
+			levelDimension: {
+				width: 800,
+				height: 500
+			},
+			player1: {
+				x: 50,
+				y: 50,
+				width: 50,
+				height: 50,
+				movingLeft: false,
+				movingRight: false,
+				movingUp: false,
+				movingDown: false,
+			},
+			player2: {
+				x: 50,
+				y: 300,
+				width: 50,
+				height: 50,
+				movingLeft: false,
+				movingRight: false,
+				movingUp: false,
+				movingDown: false,
+			},
+			walls: [
+				{
+					x: 200,
+					y: 0,
+					width: 50,
+					height: 350,
+					isFire: false,
+				},
+				{
+					x: 400,
+					y: 150,
+					width: 50,
+					height: 350,
+					isFire: false,
+				},
+				{
+					x: 600,
+					y: 0,
+					width: 50,
+					height: 350,
+					isFire: false,
+				},
+				{
+					x: 215,
+					y: 200,
+					width: 250,
+					height: 50,
+					isFire: true,
+				},
+				{
+					x: 700,
+					y: 50,
+					width: 50,
+					height: 50,
+					isFire: false,
+					key: true
+				}
+			],
+			fireWallsCounter: 0,
+			mainLoop: function () {
+				setInterval(function() {
+					var collisionHorizontaleDetectee = false;
+					var collisionVerticaleDetectee = false;
+					var vecteurX1 = 0;
+					var vecteurY1 = 0;
+					var vecteurX2 = 0;
+					var vecteurY2 = 0;
 
+					if (rules.player1.movingLeft) {
+						vecteurX1 = -8;
+					}
+					if (rules.player1.movingRight) {
+						vecteurX1 = 8;
+					}
+					if (rules.player1.movingUp) {
+						vecteurY1 = -8;
+					}
+					if (rules.player1.movingDown) {
+						vecteurY1 = 8;
+					}
+
+					if (rules.player2.movingLeft) {
+						vecteurX2 = -8;
+					}
+					if (rules.player2.movingRight) {
+						vecteurX2 = 8;
+					}
+					if (rules.player2.movingUp) {
+						vecteurY2 = -8;
+					}
+					if (rules.player2.movingDown) {
+						vecteurY2 = 8;
+					}
+		
+					// canvas border collisions tests
+					// horizontal test
+					if (rules.player1.x + vecteurX1 > 0 && rules.player1.x + rules.player1.width + vecteurX1 < rules.levelDimension.width) {
+						collisionHorizontaleDetectee = false;
+					} else {
+						collisionHorizontaleDetectee = true;
+					}
+					// vertical test
+					if (rules.player1.y + vecteurY1 > 0 && rules.player1.y + rules.player1.height + vecteurY1 < rules.levelDimension.height) {
+						collisionVerticaleDetectee = false;
+					} else {
+						collisionVerticaleDetectee = true;
+					}
+		
+					// test set up collisions
+					for (var i = 0; i < rules.walls.length; i++) {
+						// compraisons between hitbox player and every hitbos set up
+						if (
+							rules.player1.y + rules.player1.height + vecteurY1 > rules.walls[i].y
+							&& rules.player1.y + vecteurY1 < rules.walls[i].y + rules.walls[i].height
+							&& rules.player1.x + rules.player1.width + vecteurX1 > rules.walls[i].x
+							&& rules.player1.x + vecteurX1 < rules.walls[i].x + rules.walls[i].width
+							) {
+							
+							// If horizontal collision detected, block horizontal moves
+							if (rules.player1.y + rules.player1.height > rules.walls[i].y && rules.player1.y < rules.walls[i].y + rules.walls[i].height) {
+								collisionHorizontaleDetectee = true;
+								// Firewall collisions management
+								if (rules.walls[i].isFire) {
+									document.location.reload(true);
+								}
+								// victory management
+								if (rules.walls[i].key) {
+									alert('victoire !')
+								}
+							}
+							//If vertical collision detected, block vertical moves
+							if (rules.player1.x + rules.player1.width > walls[i].x && rules.player1.x < walls[i].x + walls[i].width) {
+								collisionVerticaleDetectee = true;
+								// Firewall collisions management
+								if (rules.walls[i].isFire) {
+									document.location.reload(true);
+								}
+								// victory management
+								if (rules.walls[i].key) {
+									alert('victoire !')
+								}
+							}
+							// If no collision detected so the player is making a diagonal move
+							if (!collisionHorizontaleDetectee && !collisionVerticaleDetectee) {
+								collisionHorizontaleDetectee = true;
+								collisionVerticaleDetectee = true;
+								// Firewall collisions management
+								if (rules.walls[i].isFire) {
+									document.location.reload(true);
+								}
+								// victory management
+								if (rules.walls[i].key) {
+									alert('victoire !')
+								}
+							}
+						}
+					}
+		
+					// player1 moves
+					if (!collisionHorizontaleDetectee) {
+						rules.player1.x += vecteurX1;
+					}
+					if (!collisionVerticaleDetectee) {
+						rules.player1.y += vecteurY1;
+					}
+		
+					// Fire walls moves
+					rules.fireWallsCounter += 0.05;
+					for (var i = 0; i < rules.walls.length; i++) {
+						if (rules.walls[i].isFire) {
+							rules.walls[i].x += Math.sin(rules.fireWallsCounter) * 4
+						}
+					}
+
+					serverSocketIO.emit('updateFrontElements', {
+						player1: rules.player1,
+						player2: rules.player2,
+						walls: rules.walls
+					});
+				}, 40);
+			},
+			updatePlayerMoves: function (socket, moves) {
+				let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
+				let player;
+				if (socket.id === instancesList[instanceRequired - 1].player1Id) {
+					player = rules.player1;
+				} else if (socket.id === instancesList[instanceRequired - 1].player2Id) {
+					player = rules.player2;
+				} else {
+					return false
+				}
+				if (moves.movingUp) {
+					player.movingUp = moves.movingUp;
+				}
+				if (moves.movingDown) {
+					player.movingDown = moves.movingDown;
+				}
+				if (moves.movingLeft) {
+					player.movingLeft = moves.movingLeft;
+				}
+				if (moves.movingRight) {
+					player.movingRight = moves.movingRight;
+				}
+			}
+		};
+	}
+	return rules;
 }
 
 serverSocketIO.on('connection', function (socket) {
@@ -580,6 +795,15 @@ serverSocketIO.on('connection', function (socket) {
 		let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
 		if (instancesList[instanceRequired - 1] && instancesList[instanceRequired - 1].active) {
 			console.log('Serveur dit : Connecté au navigateur, dans la partie '+ instanceRequired + ', demande faite par ' + socket.id);
+			if (true && !instancesList[instanceRequired - 1].rules.levelStarted) {
+				instancesList[instanceRequired - 1].rules.levelStarted = true;
+				instancesList[instanceRequired - 1].rules.mainLoop();
+				console.log('level ' + instanceRequired + ' started')
+			}
+			// Here we collect players inputs
+			socket.on('playerMove', function (moves) {
+				updatePlayerMoves(socket, moves);
+			});
 		} else {
 			console.log('Serveur dit : l\'accès à l\'instance ' + instanceRequired + ' est refusé, demande faite par ' + socket.id);
 			socket.emit('redirectToLobby');

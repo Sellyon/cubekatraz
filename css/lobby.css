@@ -1,3 +1,56 @@
+*{padding:0;margin:0}
+#canvas {
+	border: 1px solid black;
+}
+
+/*Belka*/
+body{
+	background-color : #324539;
+	color : white;
+	font-family: 'Special Elite', cursive;
+}
+a:visited{
+	color: white;
+}
+nav{
+	width : 80%;
+	margin : 0 auto;
+	height: 100px;
+	text-align: center;
+}
+
+nav ul li {
+	display: inline-block;
+	width: 12%;
+	border : 2px solid transparent;
+}
+nav ul li:hover{
+	border : 2px solid white;;
+}
+
+#main{
+	width : 70%;
+	margin : 0 auto;
+	text-align: center;
+}
+#main p{
+	margin: 10px;
+}
+
+/*****User management *****/
+
+#userManage{
+	width : 150px;
+	height : 200px;
+	border : 1px solid white;
+	position: fixed;
+	left : 0px;
+	top : 200px;
+}
+
+
+
+
 #chatBox {
 	height: 200px;
 	width: 80%;
