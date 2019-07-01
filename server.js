@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Partie HTTP
+ * HTTP part
  */
 
 const path = require('path');
@@ -58,6 +58,7 @@ app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded()); // to support URL-encoded bodies
 app.use("/images", express.static(__dirname + '/images'));
 app.use("/css", express.static(__dirname + '/css'));
+app.use("/js", express.static(__dirname + '/js'));
 app.use(session({
     secret:'123456789SECRET',
     saveUninitialized : false,
@@ -216,8 +217,11 @@ app.get('/hallOfFame', function (req, res) {
 });
 
 app.get('/lobby', function(req, res) {
-	userName = (getUserName(req));
     res.render('lobby', { profil: getUserName(req), title: 'index', message: getUserName(req)});
+})
+
+app.get('/game/:number', function(req, res) {
+    res.render('game', { profil: getUserName(req), title: 'index', message: getUserName(req)});
 })
 
 app.use('/Unauthorized', function (req, res) {
@@ -234,10 +238,9 @@ let BaseHTTPServer = app.listen(port,function() {
 
 
 /**
-* Partie lobby chat Websocket
+* Lobby chat Websocket
 */
 
-let userName;
 let connectedNumber = 0;
 let playerList = [];
 let SocketIO = require('socket.io');
@@ -250,143 +253,336 @@ let avatarList = [
 ];
 let avatarSlot1 = {
 	image: 'jail.jpg',
-	status: 'empty'
+	status: 'empty',
+	name: 'vide'
 };
 let avatarSlot2 = {
 	image: 'jail.jpg',
-	status: 'empty'
+	status: 'empty',
+	name: 'vide'
 };
 
-serverSocketIO.on('connection', function (socket) {
+let countDownStarted = false;
+let countDownForbidden = false;
 
-    console.log('Serveur dit : Connecté au navigateur');
-    // console.log(req);
+let updateFrontPlayerList = function () {
+	serverSocketIO.emit('updatePlayerList', playerList);
+};
 
-	connectedNumber ++;
-
-    playerList.push(socket.id);
-    serverSocketIO.emit('hereIsYourChallenger', {
-		playerList: playerList,
+let updateAvatarslots = function (socket) {
+	var target = serverSocketIO;
+	if (socket) {
+		target = socket;
+	}
+	target.emit('updateFrontAvatarslots', {
 		slot1: {
 			avatarSlot1: 'images/portraits/' + avatarSlot1.image,
-			status: avatarSlot1.status
+			status: avatarSlot1.status,
+			name: avatarSlot1.name
 		},
 		slot2: {
 			avatarSlot2: 'images/portraits/' + avatarSlot2.image,
-			status: avatarSlot2.status
+			status: avatarSlot2.status,
+			name: avatarSlot2.name
 		}
-    });
-	
-	socket.on('serverChatNeedTexts', function (data) {
-		client.connect(uri, function () {
-			myDB = client.get().db('twoPrisoners');
-			let collection = myDB.collection('lobbyChat');
-			collection.aggregate([
-			{
-				$match: {
-				_id:{
-					$exists: true
+	});
+};
+
+let updateAntichamberStatus = function () {
+	var antichamberStatusText;
+	if (avatarSlot1.status === 'empty' && avatarSlot2.status === 'empty') {
+		antichamberStatusText = 'Aucun prisonnier n\'est sur le point de s\'évader';
+	} else if ((avatarSlot1.status !== 'empty' && avatarSlot2.status === 'empty') || (avatarSlot1.status === 'empty' && avatarSlot2.status !== 'empty')) {
+		antichamberStatusText = 'Un prisonnier veut s\'échapper';
+	} else {
+		antichamberStatusText = 'Evasion imminente !';
+	}
+	serverSocketIO.emit('updateAntichamberStatusBack', antichamberStatusText);
+};
+
+let initiateEvasionCountDown = function () {
+	if (!countDownStarted) {
+		let countDownValue = 125; // 125*40(intervals) = 5 seconds
+		let countDownText;
+		countDownStarted = true;
+
+		let countDownInterval =	setInterval(function () {
+			countDownText = Math.round(countDownValue * 40 / 1000);
+			if (countDownValue <= 0 || countDownForbidden) {
+				serverSocketIO.emit('EvasionCountDownBackFinished');
+				clearInterval(countDownInterval);
+				countDownForbidden = false;
+				countDownStarted = false;
+				if (countDownValue <= 0) {
+					console.log('instance creation : ');
+					instancesList.push({
+						player1Id: avatarSlot1.status,
+						player1Name: avatarSlot1.name,
+						player1Image: avatarSlot1.image,
+						player1Score: 0,
+						player2Id: avatarSlot2.status,
+						player2Name: avatarSlot2.name,
+						player2Image: avatarSlot2.image,
+						player2Score: 0,
+						level: 1,
+						active: true
+					});
+					var destination = '/game/' + instancesList.length;
+					serverSocketIO.emit('redirectToGameInstance', {
+						url: destination,
+						player1: avatarSlot1.name,
+						player2: avatarSlot2.name
+					});
 				}
-				}},
-				{ $sort: { date: 1 } },
-				{ $limit: 100 },
-			]).toArray(function(err, data){
-			if (err) throw err;
-			if (data[0] !== undefined){
-					socket.emit('serverGiveChatTexts', data);
+			} else {
+				serverSocketIO.emit('updateEvasionCountDownBack', countDownText);
+				countDownValue--;
 			}
-			client.close();
+		}, 40);
+	}
+}
+
+let emptySlot = function (socket) {
+	let leavingName;
+	for (var i = 0; i < playerList.length; i++) {
+		if (socket.id === playerList[i].id) {
+			leavingName = playerList[i].name;
+		}
+	}
+	if (avatarSlot1.status === socket.id) {
+		avatarSlot1.status = 'empty';
+		avatarSlot1.image = 'jail.jpg';
+		avatarSlot1.name = 'vide';
+		return {
+			slot: 1,
+			id: socket.id,
+			name: leavingName
+		}
+	} else if (avatarSlot2.status === socket.id) {
+		avatarSlot2.status = 'empty';
+		avatarSlot2.image = 'jail.jpg';
+		avatarSlot2.name = 'vide';
+		return {
+			slot: 2,
+			id: socket.id,
+			name: leavingName
+		}
+	} else {
+		return {
+			id: socket.id
+		}
+	}
+}
+
+const lobbyRegex = /\Wlobby$/i;
+
+serverSocketIO.on('connection', function (socket) {
+	if (lobbyRegex.test(socket.handshake.headers.referer)) {
+	    console.log('Serveur dit : Connecté au navigateur, bienvenu au lobby ' + socket.id);
+
+		connectedNumber ++;
+
+		socket.on('giveUserName', function (name) {
+		    playerList.push({
+		    	id: socket.id,
+		    	name: name
+		    });
+		    updateFrontPlayerList();
+		    socket.on('nameInFrontUpdated', function () {
+		    	updateAvatarslots(socket);
+		    	socket.emit('updateConnectedList', playerList);
+		    	updateAntichamberStatus();
 			});
 		});
-	});
-
-	// Add chat message to the DB
-    socket.on('chatTextSubmitted', function (data) {
-		client.connect(uri, function () {
-			myDB = client.get().db('twoPrisoners');
-			let collection = myDB.collection('lobbyChat');
-			collection.insertOne({
-				author: data.author,
-				message: data.message,
-				date: data.date
+		
+		socket.on('serverChatNeedTexts', function (data) {
+			client.connect(uri, function () {
+				myDB = client.get().db('twoPrisoners');
+				let collection = myDB.collection('lobbyChat');
+				collection.aggregate([
+				{
+					$match: {
+					_id:{
+						$exists: true
+					}
+					}},
+					{ $sort: { date: 1 } },
+					{ $limit: 100 },
+				]).toArray(function(err, data){
+				if (err) throw err;
+				if (data[0] !== undefined){
+						socket.emit('serverGiveChatTexts', data);
+				}
+				client.close();
+				});
 			});
 		});
-        serverSocketIO.emit('chatTextDispatched', data);
-	});
-	
-	// Disconnection management
-	socket.on('disconnect', function () {
-    	serverSocketIO.emit('userDisconnected', socket.id);
-    	for (var i = 0; i < avatarList.length; i++) {
-			// if (slot.image === avatarList[i]) {
-			// 	if (i + 1 < avatarList.length) {
-			// 		if (otherSlot.image !== avatarList[(i + 1) % avatarList.length]) {
-			// 			slot.image = avatarList[(i + 1) % avatarList.length];
-			// 		} else {
-			// 			slot.image = avatarList[(i + 2) % avatarList.length];
-			// 		}
-			// 	}
-			// }
-		}
-	    for (var i = 0; i < playerList.length; i++) {
-            if (socket.id === playerList[i]) {
-            	playerList.splice(i, 1);
-            	i = playerList.length;
-            }
-		}
-		connectedNumber --;
-	});
 
-	// Antichamber management
-	socket.on('antichamberChangeNav', function () {
-		if (userName !== avatarSlot1.status && userName !== avatarSlot2.status && (avatarSlot1.status === 'empty' || avatarSlot2.status === 'empty')) {
-			if (avatarSlot1.status === 'empty') {
-				avatarSlot1.status = userName;
+		// Add chat message to the DB
+	    socket.on('chatTextSubmitted', function (data) {
+			client.connect(uri, function () {
+				myDB = client.get().db('twoPrisoners');
+				let collection = myDB.collection('lobbyChat');
+				collection.insertOne({
+					author: data.author,
+					message: data.message,
+					date: data.date
+				});
+			});
+	        serverSocketIO.emit('chatTextDispatched', data);
+		});
+		
+		// Disconnection management
+		socket.on('disconnect', function () {
+			serverSocketIO.emit('userDisconnected', emptySlot (socket));
+			updateAntichamberStatus();
+		    for (var i = 0; i < playerList.length; i++) {
+	            if (socket.id === playerList[i].id) {
+	            	playerList.splice(i, 1);
+	            	i = playerList.length;
+	            }
+			}
+			serverSocketIO.emit('updateConnectedList', playerList);
+			connectedNumber --;
+		});
+
+		// Antichamber management
+		socket.on('antichamberChangeFront', function () {
+			// test if the player is already in a slot or not (to determine if the player want to join or leave a slot)
+			if (socket.id === avatarSlot1.status || socket.id === avatarSlot2.status) {
+				serverSocketIO.emit('userLeaveAntichamber', emptySlot (socket));
+				socket.emit('updateAntichamberAdderText', 'Rejoindre la partie');
+
+			// The player wants to join a slot, so we test if there is a slot available or not
+			} else if (socket.id !== avatarSlot1.status && socket.id !== avatarSlot2.status && (avatarSlot1.status === 'empty' || avatarSlot2.status === 'empty')) {
+				if (avatarSlot1.status === 'empty') {
+					avatarSlot1.status = socket.id;
+					for (var i = 0; i < playerList.length; i++) {
+						if (socket.id === playerList[i].id) {
+							avatarSlot1.name = playerList[i].name;
+						}
+					}
+					avatarSlot1.image = getAvatarImage(avatarSlot1);
+				} else {
+					avatarSlot2.status = socket.id;
+					for (var i = 0; i < playerList.length; i++) {
+						if (socket.id === playerList[i].id) {
+							avatarSlot2.name = playerList[i].name;
+						}
+					}
+					avatarSlot2.image = getAvatarImage(avatarSlot2);
+				}
+		    	serverSocketIO.emit('playerHasJoinedAntichamber', {
+		    		slot1: {
+		    			slotName: 'slot1',
+		    			status: avatarSlot1.status,
+		    			image: avatarSlot1.image,
+		    			name: avatarSlot1.name
+		    		},
+		    		slot2: {
+		    			slotName: 'slot2',
+		    			status: avatarSlot2.status,
+		    			image: avatarSlot2.image,
+		    			name: avatarSlot2.name
+		    		}
+		    	});
+		    	socket.emit('updateAntichamberAdderText', 'quitter la partie');
+		    }
+		    updateAntichamberStatus();
+		    if (avatarSlot1.status !== 'empty' && avatarSlot2.status !== 'empty') {
+		    	initiateEvasionCountDown();
+		    } else {
+		    	if (countDownStarted) {
+					if (!countDownForbidden) {
+						countDownForbidden = true;
+					}
+				}
+		    }
+		});
+
+		socket.on('stopEvasionCountDown', function () {
+			if (countDownStarted) {
+				if (!countDownForbidden) {
+					countDownForbidden = true;
+				}
+			}
+		});
+
+		socket.on('switchAvatarSlot1', function () {
+			if (socket.id === avatarSlot1.status) {
 				avatarSlot1.image = getAvatarImage(avatarSlot1);
+				serverSocketIO.emit('switchAntichamberBack', {
+					slot: 'slot1',
+					image: avatarSlot1.image
+				});
 			} else {
-				avatarSlot2.status = userName;
-				avatarSlot2.image = getAvatarImage(avatarSlot1);
+				console.log('Access forbidden to slot 1 !');
 			}
-		}
-    	serverSocketIO.emit('antichamberChangeServ', {
-    		slot1: {
-    			status: avatarSlot1.status,
-    			image: avatarSlot1.image
-    		},
-    		slot2: {
-    			status: avatarSlot2.status,
-    			image: avatarSlot2.image
-    		}
-    	});
-	});
+		});
 
-	const getAvatarImage = function (slot) {
-		let otherSlot;
-		if (slot === avatarSlot1.status) {
-			otherSlot = avatarSlot2;
-		} else {
-			otherSlot = avatarSlot1;
-		}
-		if (slot.image === 'jail.jpg') {
-			if (otherSlot.image !== 'cody.jpg') {
-				slot.image = 'cody.jpg';
+		socket.on('switchAvatarSlot2', function () {
+			if (socket.id === avatarSlot2.status) {
+				avatarSlot2.image = getAvatarImage(avatarSlot2);
+				serverSocketIO.emit('switchAntichamberBack', {
+					slot: 'slot2',
+					image: avatarSlot2.image
+				});
 			} else {
-				slot.image = 'dalton.jpg';
+				console.log('Access forbidden to slot 2 !');
 			}
-		} else {
-			for (var i = 0; i < avatarList.length; i++) {
-				if (slot.image === avatarList[i]) {
-					if (i + 1 < avatarList.length) {
+		});
+
+		const getAvatarImage = function (slot) {
+			let otherSlot;
+			if (slot === avatarSlot1) {
+				otherSlot = avatarSlot2;
+			} else {
+				otherSlot = avatarSlot1;
+			}
+			if (slot.image === 'jail.jpg') {
+				if (otherSlot.image !== avatarList[0]) {
+					slot.image = avatarList[0];
+				} else {
+					slot.image = avatarList[1];
+				}
+			} else {
+				for (var i = 0; i < avatarList.length; i++) {
+					if (slot.image === avatarList[i]) {
 						if (otherSlot.image !== avatarList[(i + 1) % avatarList.length]) {
 							slot.image = avatarList[(i + 1) % avatarList.length];
 						} else {
 							slot.image = avatarList[(i + 2) % avatarList.length];
 						}
+						i = avatarList.length;
 					}
 				}
 			}
+			return slot.image
 		}
-		console.log(slot.image);
-		return slot.image
+	}
+});
+
+
+/**
+* Instances Websocket
+*/
+
+const gameRegex = /\Wgame\W\d+$/i;
+const instanceRegex = /\d+$/i;
+const instancesList = [];
+
+const instanceGenerator = function (instanceId) {
+
+}
+
+serverSocketIO.on('connection', function (socket) {
+	if (gameRegex.test(socket.handshake.headers.referer)) {
+		let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
+		if (instancesList[instanceRequired - 1] && instancesList[instanceRequired - 1].active) {
+			console.log('Serveur dit : Connecté au navigateur, dans la partie '+ instanceRequired + ', demande faite par ' + socket.id);
+		} else {
+			console.log('Serveur dit : l\'accès à l\'instance ' + instanceRequired + ' est refusé, demande faite par ' + socket.id);
+			socket.emit('redirectToLobby');
+		}
 	}
 });

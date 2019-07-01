@@ -5,6 +5,20 @@
 	overflow: auto;
 }
 
+#connectedPlayers {
+	height: 200px;
+	width: 40%;
+	border: 1px solid black;
+	overflow: auto;
+}
+
+#currentMatches {
+	height: 200px;
+	width: 40%;
+	border: 1px solid black;
+	overflow: auto;
+}
+
 #player1AvatarSelect {
 	visibility: hidden;
 }
