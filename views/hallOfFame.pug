@@ -3,28 +3,29 @@ html
   body
     include includes/navigation.pug
     block content
-    h1
-      | Le panthéon
+    div#main
+      h1
+        | Le panthéon
 
-    p
-      | Ici est entretenue la mémoire des héros qui ont marqué l'histoire de Cubekatraz.
-    h2
-      | Les meilleurs duos
-    each duo , index in data
-        ul
-          li
-            | Joueur 1 : 
-            a= duo.player1
-          li
-            | Joueur 2 : 
-            a= duo.player2
-          li
-            | Score du groupe : 
-            a= duo.score
-          li
-            | Victoire du groupe : 
-            a= duo.victory
-          li
-            | Temps écoulé : 
-            a= duo.time
+      p
+        | Ici est entretenue la mémoire des héros qui ont marqué l'histoire de Cubekatraz.
+      h2
+        | Les meilleurs duos
+      each duo , index in data
+          div#oneHOFMatch
+            p
+              | Joueur 1 : 
+              a(href='/profil/' + duo.player1)= duo.player1
+            p
+              | Joueur 2 : 
+              a(href='/profil/' + duo.player2)= duo.player2
+            p
+              | Score du groupe : 
+              span= duo.score
+            p
+              | Victoire du groupe : 
+              span= duo.victory
+            p
+              | Temps écoulé : 
+              span= duo.time
             p= "Partie faite le " + duo.date

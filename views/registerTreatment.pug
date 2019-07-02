@@ -3,5 +3,11 @@ html
   body
     block menu
       include includes/navigation.pug
-
-    p= message
+    div#main
+      p= message
+      button#indexButton(name='button')
+          a(href='/lobby') JOUER
+      button#indexButton(name='button')
+          a(href='/login') SE CONNECTER
+      button#indexButton(name='button')
+          a(href='/register') S'ENREGISTRER

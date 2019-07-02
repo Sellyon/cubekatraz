@@ -7,8 +7,8 @@ html
     window.document.addEventListener('DOMContentLoaded', function () {
 
       // web socket stuff
-      var socket = io('https://two-prisoners.herokuapp.com/');
-      //var socket = io('http://localhost:8080/');
+      //var socket = io('https://two-prisoners.herokuapp.com/');
+      var socket = io('http://localhost:8080/');
 
       socket.on('connect', function () {
         console.log('Navigateur dit : Connecté au serveur');
@@ -247,6 +247,18 @@ html
           |  à Cubekatraz
         p
           | Vous pouvez rejoindre la salle d'attente pour lancer une partie, consulter les profils des joueurs connectés, regarder en tant que spectateur les partie en cours ou bien discuter avec les autres joueurs sur le tchat.
+      div#lobbyChat
+        h2
+          | Le réfectoire
+        p
+          | C'est ici que les prisonniers profitent du déjeuner en compagnie des autres pour s'échanger des informations et organiser leurs fuites.
+        div#chatBox
+          span#chatChild
+        form#tchatForm(action='/test', method='post')
+          div
+            label(for='msg') Message :
+            input#msg(name='message', minlength='1', style='width:80%')
+            input(type='submit', value='envoyer')
       div#lobbyAntichamber
         h2
           | Salle d'attente
@@ -284,15 +296,3 @@ html
             | Vous pouvez observer d'ici les braves risquant leur peau pour s'échapper
         div#currentMatches
           span#matchChild
-      div#lobbyChat
-        h2
-          | Le réfectoire
-        p
-          | C'est ici que les prisonniers profitent du déjeuner en compagnie des autres pour s'échanger des informations et organiser leurs fuites.
-        div#chatBox
-          span#chatChild
-        form#tchatForm(action='/test', method='post')
-          div
-            label(for='msg') Message :
-            input#msg(name='message', minlength='1', style='width:500px')
-            input(type='submit', value='envoyer')

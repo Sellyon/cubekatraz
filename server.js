@@ -68,6 +68,7 @@ const getVictoryMessage = function (message) {
 const getHandshakeId = function (socket) {
 	const cookieRegex = /connect.sid\=([^;]+)/g;
 	let userID = cookieRegex.exec(cookieParser.JSONCookies(socket.handshake.headers.cookie));
+	console.log(socket.handshake);
 	if (!userID) {
 		return false
 	}

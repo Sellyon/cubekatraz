@@ -12,15 +12,13 @@ html
         | Cubekatraz est un jeu de coopération online qui met deux joueurs dans la peau de deux cubes intrépides bien décidés à s'échapper de la plus impitoyable des prisons qui soit : Cubekatraz !
       p
         | Saurez-vous en sortir indemne ?
+      button#indexButton(name='button')
+        a(href='/lobby') JOUER
       p
-        | Vous découvrez le jeu et souhaitez y jouer ?
+        | Pas connecté ?
+      button#indexButton(name='button')
+        a(href='/login') SE CONNECTER
       p
-        | Rien de plus facile : 
-      p
-        | Enregistrez-vous en vous rendant sur ce lien.
-      p
-        | Si c'est déjà fait connectez-vous ici.
-      p
-        | Pour jouer rendez-vous sur ce lien.
-      p
-        | Amusez-vous bien !
+        | Pas enregistré ?
+      button#indexButton(name='button')
+        a(href='/register') S'ENREGISTRER

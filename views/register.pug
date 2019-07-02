@@ -3,12 +3,13 @@ html
   body
     block menu
       include includes/navigation.pug
-  h1 Créer profil
-  form(action='/registerTreatment' method='post')
-    label(for='login') Identifiant :
-    input#name(type='text' name='user_login')
-    label(for='password') Mot de passe :
-    input#surname(type='password' name='user_password')
-    button(type='submit') Envoyer le message
+    div#main
+      h1 Créer profil
+      form(action='/registerTreatment' method='post')
+        label(for='login') Identifiant :
+        input#name(type='text' name='user_login')
+        label(for='password') Mot de passe :
+        input#surname(type='password' name='user_password')
+        button(type='submit') Envoyer le message
 
-    p= message
+        p= message

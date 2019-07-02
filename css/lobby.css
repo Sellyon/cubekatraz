@@ -3,7 +3,6 @@
 	border: 1px solid black;
 }
 
-/*Belka*/
 body{
 	background-color : #EBC193;
 	color : #5C302A;
@@ -13,16 +12,25 @@ a:visited{
 	color: #5C3060;
 }
 
+p {
+	font-family: Arial, Helvetica, sans-serif; 
+}
+
 #nav{
 	border : 1px solid #5C302A;
 	background-color: bisque;
 	padding: 5;
 }
 
+#aside {
+	display: inline-block;
+    vertical-align: top;
+}
+
 nav{
 	width : 80%;
 	margin : 0 auto;
-	height: 100px;
+	height: 50px;
 	text-align: center;
 }
 
@@ -32,7 +40,10 @@ nav ul li {
 	border : 2px solid transparent;
 }
 nav ul li:hover{
-	border : 2px solid #5C302A;;
+	border-bottom : 2px solid #5C302A;
+}
+nav ul li a {
+	text-decoration:none;
 }
 
 #main{
@@ -40,6 +51,7 @@ nav ul li:hover{
 	margin : 0 auto;
 	padding: 25;
 	text-align: center;
+	display: inline-block;
 }
 #main p{
 	margin: 10px;
@@ -52,10 +64,29 @@ nav ul li:hover{
 	height : 200px;
 	border : 1px solid #5C302A;
 	background-color: bisque;
-	position: fixed;
+	/* position: fixed; */
 	left : 0px;
 	top : 200px;
-	padding: 5;
+	padding: 10;
+}
+
+#userManage ul li {
+	margin-bottom: 20;
+}
+
+#indexButton {
+	width: 200;
+    height: 50;
+    font-size: 20;
+    color: bisque;
+	background-color: #5C302A;
+}
+
+#indexButton a {
+	color: bisque;
+	text-decoration:none;
+	width: 100%;
+	height: 100%;
 }
 
 #lobbyWelcome{
@@ -68,7 +99,7 @@ nav ul li:hover{
 
 #chatBox {
 	height: 200px;
-	width: 80%;
+	width: 100%;
 	border: 1px solid #5C302A;
 	background-color: bisque;
 	overflow: auto;
@@ -158,4 +189,14 @@ nav ul li:hover{
 #lobbyChat {
 	margin-top: 80;
 	margin-bottom: 80;
+}
+
+#oneHOFMatch {
+	width: 90%;
+	margin: 5;
+    padding: 10;
+	border: 1px solid #5C302A;
+	background-color: bisque;
+	text-align: left;
+    list-style: none;
 }
