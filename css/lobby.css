@@ -5,13 +5,20 @@
 
 /*Belka*/
 body{
-	background-color : #324539;
-	color : white;
+	background-color : #EBC193;
+	color : #5C302A;
 	font-family: 'Special Elite', cursive;
 }
 a:visited{
-	color: white;
+	color: #5C3060;
 }
+
+#nav{
+	border : 1px solid #5C302A;
+	background-color: bisque;
+	padding: 5;
+}
+
 nav{
 	width : 80%;
 	margin : 0 auto;
@@ -25,12 +32,13 @@ nav ul li {
 	border : 2px solid transparent;
 }
 nav ul li:hover{
-	border : 2px solid white;;
+	border : 2px solid #5C302A;;
 }
 
 #main{
 	width : 70%;
 	margin : 0 auto;
+	padding: 25;
 	text-align: center;
 }
 #main p{
@@ -42,40 +50,112 @@ nav ul li:hover{
 #userManage{
 	width : 150px;
 	height : 200px;
-	border : 1px solid white;
+	border : 1px solid #5C302A;
+	background-color: bisque;
 	position: fixed;
 	left : 0px;
 	top : 200px;
+	padding: 5;
 }
 
+#lobbyWelcome{
+	margin-bottom: 80;
+}
 
-
+#lobbyAntichamber {
+	margin-bottom: 80;
+}
 
 #chatBox {
 	height: 200px;
 	width: 80%;
-	border: 1px solid black;
+	border: 1px solid #5C302A;
+	background-color: bisque;
 	overflow: auto;
+}
+
+#lobbyConnectedPlayers {
+	width: 40%;
+	display: inline-block;
 }
 
 #connectedPlayers {
 	height: 200px;
-	width: 40%;
-	border: 1px solid black;
+	width: 90%;
+	margin: 25;
+	border: 1px solid #5C302A;
+	background-color: bisque;
 	overflow: auto;
+}
+
+#lobbyCurrentMatches {
+	width: 40%;
+	display: inline-block;
 }
 
 #currentMatches {
 	height: 200px;
-	width: 40%;
-	border: 1px solid black;
+	width: 90%;
+	margin: 25;
+	border: 1px solid #5C302A;
+	background-color: bisque;
 	overflow: auto;
+	display: inline-block;
+}
+
+#antichamberAdder {
+	width: 200;
+    height: 50;
+    font-size: 20;
+    color: bisque;
+    background-color: #5C302A;
+}
+
+#slotPlayer1{
+	width: 40%;
+	display: inline-block;
+}
+
+#slotPlayer2{
+	width: 40%;
+	display: inline-block;
+}
+
+#avatarPlayer1{
+	border: 1px solid #5C302A;
+}
+
+#avatarPlayer2{
+	border: 1px solid #5C302A;
 }
 
 #player1AvatarSelect {
 	visibility: hidden;
+	width: 50;
+    height: 50;
+    font-size: 40;
+    color: bisque;
+    background-color: #5C302A;
+    vertical-align: bottom;
 }
 
 #player2AvatarSelect {
 	visibility: hidden;
+	width: 50;
+    height: 50;
+    font-size: 40;
+    color: bisque;
+    background-color: #5C302A;
+    vertical-align: bottom;
+}
+
+#evasionCountDown {
+	display: inline-block;
+	font-family: 'Special Elite', cursive;
+	font-size: 10em;
+}
+
+#lobbyChat {
+	margin-top: 80;
+	margin-bottom: 80;
 }

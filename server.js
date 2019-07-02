@@ -249,7 +249,7 @@ app.get('/hallOfFame', function (req, res) {
 	});
 });
 
-app.get('/lobby', function(req, res) {
+app.get('/lobby', [requireLogin], function(req, res) {
     res.render('lobby', { profil: getUserName(req), title: 'index', message: getUserName(req)});
 })
 
@@ -520,7 +520,7 @@ serverSocketIO.on('connection', function (socket) {
 		    			name: avatarSlot2.name
 		    		}
 		    	});
-		    	socket.emit('updateAntichamberAdderText', 'quitter la partie');
+		    	socket.emit('updateAntichamberAdderText', 'Quitter la partie');
 		    }
 		    updateAntichamberStatus();
 		    if (avatarSlot1.status !== 'empty' && avatarSlot2.status !== 'empty') {
@@ -782,6 +782,7 @@ const instanceGenerator = function (instanceId) {
 						}
 					}
 					serverSocketIO.emit('updateFrontElements', {
+						level: instancesList[instanceId].level,
 						player1: rules.player1,
 						player1Name: instancesList[instanceNumber].player1Name,
 						player2: rules.player2,

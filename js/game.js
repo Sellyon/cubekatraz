@@ -2,8 +2,8 @@
 window.document.addEventListener('DOMContentLoaded', function () {
 
 	// web socket stuff
-    //var socket = io('https://two-prisoners.herokuapp.com/');
-    var socket = io('localhost:8080');
+    var socket = io('https://two-prisoners.herokuapp.com/');
+    //var socket = io('localhost:8080');
 
     socket.on('connect', function () {
     	console.log('Navigateur dit : Connect� au serveur');
@@ -20,6 +20,8 @@ window.document.addEventListener('DOMContentLoaded', function () {
 		var player1;
 		var player2;
 		var walls;
+
+		var levelTitle = document.getElementById('levelTitle');
 
 		window.onkeydown = function(event) {
 			var e = event || window.event;
@@ -104,6 +106,11 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			player1 = data.player1;
 			player2 = data.player2;
 			walls = data.walls;
+
+			// update level title
+			if (data.level === 1) {
+				levelTitle.innerHTML = 'Niveau 1 : les cellules'
+			}
 
 			context.clearRect(0, 0, canvas.width, canvas.height);
 
