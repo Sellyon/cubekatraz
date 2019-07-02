@@ -8,16 +8,25 @@ const path = require('path');
 const express = require('express');
 const fs = require('fs');
 const app = express();
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 const MongoClient = require('mongodb').MongoClient;
 const objectId = require('mongodb').ObjectID;
 const client = require(__dirname + '/dbs/db.js');
 const uri = "mongodb+srv://yoannmroz:Ech1ariandre@cluster0-bznsv.mongodb.net/test?retryWrites=true&w=majority";
+const secret = '123456789SECRET';
 
 var myDB;
-var msToTime = function(duration) {
-    var milliseconds = parseInt((duration%1000)/100)
+
+const convertDateNowToEuropeanDate = function (date) {
+	date = new Date(date * 1000);
+	return date
+}
+
+const msToTime = function(duration) {
+    let milliseconds = parseInt((duration%1000)/100)
         , seconds = parseInt((duration/1000)%60)
         , minutes = parseInt((duration/(1000*60))%60)
         , hours = parseInt((duration/(1000*60*60))%24);
@@ -28,7 +37,18 @@ var msToTime = function(duration) {
 
     return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
 }
-var getUserName = function (req) {
+
+function requireLogin (req, res, next) {
+  if (req.session.user) {
+    // User is authenticated, let him in
+    next();
+  } else {
+    // Otherwise, we redirect him to login form
+    res.redirect("/login");
+  }
+}
+
+const getUserName = function (req) {
 	if (req.session.user) {
 		return req.session.user
 	} else {
@@ -36,12 +56,7 @@ var getUserName = function (req) {
 	}
 }
 
-var convertDateNowToEuropeanDate = function (date) {
-	date = new Date(date * 1000);
-	return date
-}
-
-var getVictoryMessage = function (message) {
+const getVictoryMessage = function (message) {
 	if (message) {
 		message = 'oui';
 	} else {
@@ -50,17 +65,35 @@ var getVictoryMessage = function (message) {
 	return message
 }
 
+const getHandshakeId = function (socket) {
+	const cookieRegex = /connect.sid\=([^;]+)/g;
+	let userID = cookieRegex.exec(cookieParser.JSONCookies(socket.handshake.headers.cookie));
+	userID = userID[0].substr(12, userID[0].length);
+	if (userID) {
+		return userID;
+	} else {
+		return false
+	}
+}
+
 app.locals.basedir = path.join(__dirname, '/views/includes');
 
 app.use( bodyParser.json() );
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded()); // to support URL-encoded bodies
 app.use("/images", express.static(__dirname + '/images'));
 app.use("/css", express.static(__dirname + '/css'));
 app.use("/js", express.static(__dirname + '/js'));
+const store = new MongoDBStore({
+  uri: uri,
+  databaseName: 'twoPrisoners',
+  collection: 'sessions'
+});
 app.use(session({
-    secret:'123456789SECRET',
+    secret: secret,
+    store: store,
     saveUninitialized : false,
     resave: false
 }));
@@ -107,6 +140,10 @@ app.post('/loginTreatment', function(req, res) {
 		});
 	});
 })
+
+store.on('error', function(error) {
+  console.log(error);
+});
 
 app.get('/register', function(req, res) {
 	let message = 'Complétez le formulaire pour vous enregistrer.'
@@ -157,12 +194,8 @@ app.post('/registerTreatment', function(req, res) {
 	});
 })
 
-app.get('/profil', function (req, res) {
-	if (req.session.user) {
-		res.redirect('/profil/' + getUserName(req));
-	} else {
-		res.redirect('/login');
-	}
+app.get('/profil', [requireLogin], function (req, res) {
+	res.redirect('/profil/' + getUserName(req));
 });
 
 app.get('/profil/:profilName', function (req, res) {
@@ -220,7 +253,7 @@ app.get('/lobby', function(req, res) {
     res.render('lobby', { profil: getUserName(req), title: 'index', message: getUserName(req)});
 })
 
-app.get('/game/:number', function(req, res) {
+app.get('/game/:number', [requireLogin], function(req, res) {
     res.render('game', { profil: getUserName(req), title: 'index', message: getUserName(req)});
 })
 
@@ -346,31 +379,31 @@ let initiateEvasionCountDown = function () {
 let emptySlot = function (socket) {
 	let leavingName;
 	for (var i = 0; i < playerList.length; i++) {
-		if (socket.id === playerList[i].id) {
+		if (getHandshakeId(socket) === playerList[i].id) {
 			leavingName = playerList[i].name;
 		}
 	}
-	if (avatarSlot1.status === socket.id) {
+	if (avatarSlot1.status === getHandshakeId(socket)) {
 		avatarSlot1.status = 'empty';
 		avatarSlot1.image = 'jail.jpg';
 		avatarSlot1.name = 'vide';
 		return {
 			slot: 1,
-			id: socket.id,
+			id: getHandshakeId(socket),
 			name: leavingName
 		}
-	} else if (avatarSlot2.status === socket.id) {
+	} else if (avatarSlot2.status === getHandshakeId(socket)) {
 		avatarSlot2.status = 'empty';
 		avatarSlot2.image = 'jail.jpg';
 		avatarSlot2.name = 'vide';
 		return {
 			slot: 2,
-			id: socket.id,
+			id: getHandshakeId(socket),
 			name: leavingName
 		}
 	} else {
 		return {
-			id: socket.id
+			id: getHandshakeId(socket)
 		}
 	}
 }
@@ -379,13 +412,13 @@ const lobbyRegex = /\Wlobby$/i;
 
 serverSocketIO.on('connection', function (socket) {
 	if (lobbyRegex.test(socket.handshake.headers.referer)) {
-	    console.log('Serveur dit : Connecté au navigateur, bienvenu au lobby ' + socket.id);
+	    console.log('Serveur dit : Connecté au navigateur, bienvenu au lobby ' + getHandshakeId(socket));
 
 		connectedNumber ++;
 
 		socket.on('giveUserName', function (name) {
 		    playerList.push({
-		    	id: socket.id,
+		    	id: getHandshakeId(socket),
 		    	name: name
 		    });
 		    updateFrontPlayerList();
@@ -438,7 +471,7 @@ serverSocketIO.on('connection', function (socket) {
 			serverSocketIO.emit('userDisconnected', emptySlot (socket));
 			updateAntichamberStatus();
 		    for (var i = 0; i < playerList.length; i++) {
-	            if (socket.id === playerList[i].id) {
+	            if (getHandshakeId(socket) === playerList[i].id) {
 	            	playerList.splice(i, 1);
 	            	i = playerList.length;
 	            }
@@ -450,24 +483,24 @@ serverSocketIO.on('connection', function (socket) {
 		// Antichamber management
 		socket.on('antichamberChangeFront', function () {
 			// test if the player is already in a slot or not (to determine if the player want to join or leave a slot)
-			if (socket.id === avatarSlot1.status || socket.id === avatarSlot2.status) {
+			if (getHandshakeId(socket) === avatarSlot1.status || getHandshakeId(socket) === avatarSlot2.status) {
 				serverSocketIO.emit('userLeaveAntichamber', emptySlot (socket));
 				socket.emit('updateAntichamberAdderText', 'Rejoindre la partie');
 
 			// The player wants to join a slot, so we test if there is a slot available or not
-			} else if (socket.id !== avatarSlot1.status && socket.id !== avatarSlot2.status && (avatarSlot1.status === 'empty' || avatarSlot2.status === 'empty')) {
+			} else if (getHandshakeId(socket) !== avatarSlot1.status && getHandshakeId(socket) !== avatarSlot2.status && (avatarSlot1.status === 'empty' || avatarSlot2.status === 'empty')) {
 				if (avatarSlot1.status === 'empty') {
-					avatarSlot1.status = socket.id;
+					avatarSlot1.status = getHandshakeId(socket);
 					for (var i = 0; i < playerList.length; i++) {
-						if (socket.id === playerList[i].id) {
+						if (getHandshakeId(socket) === playerList[i].id) {
 							avatarSlot1.name = playerList[i].name;
 						}
 					}
 					avatarSlot1.image = getAvatarImage(avatarSlot1);
 				} else {
-					avatarSlot2.status = socket.id;
+					avatarSlot2.status = getHandshakeId(socket);
 					for (var i = 0; i < playerList.length; i++) {
-						if (socket.id === playerList[i].id) {
+						if (getHandshakeId(socket) === playerList[i].id) {
 							avatarSlot2.name = playerList[i].name;
 						}
 					}
@@ -510,7 +543,7 @@ serverSocketIO.on('connection', function (socket) {
 		});
 
 		socket.on('switchAvatarSlot1', function () {
-			if (socket.id === avatarSlot1.status) {
+			if (getHandshakeId(socket) === avatarSlot1.status) {
 				avatarSlot1.image = getAvatarImage(avatarSlot1);
 				serverSocketIO.emit('switchAntichamberBack', {
 					slot: 'slot1',
@@ -522,7 +555,7 @@ serverSocketIO.on('connection', function (socket) {
 		});
 
 		socket.on('switchAvatarSlot2', function () {
-			if (socket.id === avatarSlot2.status) {
+			if (getHandshakeId(socket) === avatarSlot2.status) {
 				avatarSlot2.image = getAvatarImage(avatarSlot2);
 				serverSocketIO.emit('switchAntichamberBack', {
 					slot: 'slot2',
@@ -640,111 +673,105 @@ const instanceGenerator = function (instanceId) {
 				}
 			],
 			fireWallsCounter: 0,
-			mainLoop: function () {
+			mainLoop: function (instanceNumber) {
 				setInterval(function() {
 					var collisionHorizontaleDetectee = false;
 					var collisionVerticaleDetectee = false;
-					var vecteurX1 = 0;
-					var vecteurY1 = 0;
-					var vecteurX2 = 0;
-					var vecteurY2 = 0;
+					var player;
 
-					if (rules.player1.movingLeft) {
-						vecteurX1 = -8;
-					}
-					if (rules.player1.movingRight) {
-						vecteurX1 = 8;
-					}
-					if (rules.player1.movingUp) {
-						vecteurY1 = -8;
-					}
-					if (rules.player1.movingDown) {
-						vecteurY1 = 8;
-					}
+					for (var i = 0; i < 2; i++) {
+						var vecteurX = 0;
+						var vecteurY = 0;
+						if (i === 0) {
+							player = rules.player1;
+						} else {
+							player = rules.player2;
+						}
 
-					if (rules.player2.movingLeft) {
-						vecteurX2 = -8;
-					}
-					if (rules.player2.movingRight) {
-						vecteurX2 = 8;
-					}
-					if (rules.player2.movingUp) {
-						vecteurY2 = -8;
-					}
-					if (rules.player2.movingDown) {
-						vecteurY2 = 8;
-					}
-		
-					// canvas border collisions tests
-					// horizontal test
-					if (rules.player1.x + vecteurX1 > 0 && rules.player1.x + rules.player1.width + vecteurX1 < rules.levelDimension.width) {
-						collisionHorizontaleDetectee = false;
-					} else {
-						collisionHorizontaleDetectee = true;
-					}
-					// vertical test
-					if (rules.player1.y + vecteurY1 > 0 && rules.player1.y + rules.player1.height + vecteurY1 < rules.levelDimension.height) {
-						collisionVerticaleDetectee = false;
-					} else {
-						collisionVerticaleDetectee = true;
-					}
-		
-					// test set up collisions
-					for (var i = 0; i < rules.walls.length; i++) {
-						// compraisons between hitbox player and every hitbos set up
-						if (
-							rules.player1.y + rules.player1.height + vecteurY1 > rules.walls[i].y
-							&& rules.player1.y + vecteurY1 < rules.walls[i].y + rules.walls[i].height
-							&& rules.player1.x + rules.player1.width + vecteurX1 > rules.walls[i].x
-							&& rules.player1.x + vecteurX1 < rules.walls[i].x + rules.walls[i].width
-							) {
-							
-							// If horizontal collision detected, block horizontal moves
-							if (rules.player1.y + rules.player1.height > rules.walls[i].y && rules.player1.y < rules.walls[i].y + rules.walls[i].height) {
-								collisionHorizontaleDetectee = true;
-								// Firewall collisions management
-								if (rules.walls[i].isFire) {
-									document.location.reload(true);
+						if (player.movingLeft) {
+							vecteurX = -8;
+						}
+						if (player.movingRight) {
+							vecteurX = 8;
+						}
+						if (player.movingUp) {
+							vecteurY = -8;
+						}
+						if (player.movingDown) {
+							vecteurY = 8;
+						}
+			
+						// canvas border collisions tests
+						// horizontal test
+						if (player.x + vecteurX > 0 && player.x + player.width + vecteurX < rules.levelDimension.width) {
+							collisionHorizontaleDetectee = false;
+						} else {
+							collisionHorizontaleDetectee = true;
+						}
+						// vertical test
+						if (player.y + vecteurY > 0 && player.y + player.height + vecteurY < rules.levelDimension.height) {
+							collisionVerticaleDetectee = false;
+						} else {
+							collisionVerticaleDetectee = true;
+						}
+			
+						// test set up collisions
+						for (var j = 0; j < rules.walls.length; j++) {
+							// compraisons between hitbox player and every hitbos set up
+							if (
+								player.y + player.height + vecteurY > rules.walls[j].y
+								&& player.y + vecteurY < rules.walls[j].y + rules.walls[j].height
+								&& player.x + player.width + vecteurX > rules.walls[j].x
+								&& player.x + vecteurX < rules.walls[j].x + rules.walls[j].width
+								) {
+								
+								// If horizontal collision detected, block horizontal moves
+								if (player.y + player.height > rules.walls[j].y && player.y < rules.walls[j].y + rules.walls[j].height) {
+									collisionHorizontaleDetectee = true;
+									// Firewall collisions management
+									if (rules.walls[j].isFire) {
+										console.log('T\'ES MORT !');
+									}
+									// victory management
+									if (rules.walls[j].key) {
+										console.log('victoire !')
+									}
 								}
-								// victory management
-								if (rules.walls[i].key) {
-									alert('victoire !')
+								//If vertical collision detected, block vertical moves
+								if (player.x + player.width > rules.walls[j].x && player.x < rules.walls[j].x + rules.walls[j].width) {
+									collisionVerticaleDetectee = true;
+									// Firewall collisions management
+									if (rules.walls[j].isFire) {
+										console.log('T\'ES MORT !');
+									}
+									// victory management
+									if (rules.walls[j].key) {
+										console.log('victoire !')
+									}
 								}
-							}
-							//If vertical collision detected, block vertical moves
-							if (rules.player1.x + rules.player1.width > walls[i].x && rules.player1.x < walls[i].x + walls[i].width) {
-								collisionVerticaleDetectee = true;
-								// Firewall collisions management
-								if (rules.walls[i].isFire) {
-									document.location.reload(true);
-								}
-								// victory management
-								if (rules.walls[i].key) {
-									alert('victoire !')
-								}
-							}
-							// If no collision detected so the player is making a diagonal move
-							if (!collisionHorizontaleDetectee && !collisionVerticaleDetectee) {
-								collisionHorizontaleDetectee = true;
-								collisionVerticaleDetectee = true;
-								// Firewall collisions management
-								if (rules.walls[i].isFire) {
-									document.location.reload(true);
-								}
-								// victory management
-								if (rules.walls[i].key) {
-									alert('victoire !')
+								// If no collision detected so the player is making a diagonal move
+								if (!collisionHorizontaleDetectee && !collisionVerticaleDetectee) {
+									collisionHorizontaleDetectee = true;
+									collisionVerticaleDetectee = true;
+									// Firewall collisions management
+									if (rules.walls[j].isFire) {
+										document.location.reload(true);
+									}
+									// victory management
+									if (rules.walls[j].key) {
+										console.log('victoire !')
+									}
 								}
 							}
 						}
-					}
-		
-					// player1 moves
-					if (!collisionHorizontaleDetectee) {
-						rules.player1.x += vecteurX1;
-					}
-					if (!collisionVerticaleDetectee) {
-						rules.player1.y += vecteurY1;
+			
+						// player1 moves
+						if (!collisionHorizontaleDetectee) {
+							player.x += vecteurX;
+						}
+						if (!collisionVerticaleDetectee) {
+							player.y += vecteurY;
+						}
 					}
 		
 					// Fire walls moves
@@ -754,10 +781,11 @@ const instanceGenerator = function (instanceId) {
 							rules.walls[i].x += Math.sin(rules.fireWallsCounter) * 4
 						}
 					}
-
 					serverSocketIO.emit('updateFrontElements', {
 						player1: rules.player1,
+						player1Name: instancesList[instanceNumber].player1Name,
 						player2: rules.player2,
+						player2Name: instancesList[instanceNumber].player2Name,
 						walls: rules.walls
 					});
 				}, 40);
@@ -765,24 +793,26 @@ const instanceGenerator = function (instanceId) {
 			updatePlayerMoves: function (socket, moves) {
 				let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
 				let player;
-				if (socket.id === instancesList[instanceRequired - 1].player1Id) {
+				if (getHandshakeId(socket) === instancesList[instanceRequired - 1].player1Id) {
 					player = rules.player1;
-				} else if (socket.id === instancesList[instanceRequired - 1].player2Id) {
+				} else if (getHandshakeId(socket) === instancesList[instanceRequired - 1].player2Id) {
 					player = rules.player2;
 				} else {
 					return false
 				}
-				if (moves.movingUp) {
-					player.movingUp = moves.movingUp;
-				}
-				if (moves.movingDown) {
-					player.movingDown = moves.movingDown;
-				}
-				if (moves.movingLeft) {
-					player.movingLeft = moves.movingLeft;
-				}
-				if (moves.movingRight) {
-					player.movingRight = moves.movingRight;
+				if (player) {
+					if (moves.movingUp === true || moves.movingUp === false) {
+						player.movingUp = moves.movingUp;
+					}
+					if (moves.movingDown === true || moves.movingDown === false) {
+						player.movingDown = moves.movingDown;
+					}
+					if (moves.movingLeft === true || moves.movingLeft === false) {
+						player.movingLeft = moves.movingLeft;
+					}
+					if (moves.movingRight === true || moves.movingRight === false) {
+						player.movingRight = moves.movingRight;
+					}
 				}
 			}
 		};
@@ -794,18 +824,21 @@ serverSocketIO.on('connection', function (socket) {
 	if (gameRegex.test(socket.handshake.headers.referer)) {
 		let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
 		if (instancesList[instanceRequired - 1] && instancesList[instanceRequired - 1].active) {
-			console.log('Serveur dit : Connecté au navigateur, dans la partie '+ instanceRequired + ', demande faite par ' + socket.id);
+			console.log('Serveur dit : Connecté au navigateur, dans la partie '+ instanceRequired + ', demande faite par ' + getHandshakeId(socket));
 			if (true && !instancesList[instanceRequired - 1].rules.levelStarted) {
 				instancesList[instanceRequired - 1].rules.levelStarted = true;
-				instancesList[instanceRequired - 1].rules.mainLoop();
-				console.log('level ' + instanceRequired + ' started')
+				instancesList[instanceRequired - 1].rules.mainLoop(instanceRequired - 1);
+				console.log('level ' + instanceRequired + ' started');
+				socket.on('updatePlayerList', function (moves) {
+					playerList[instanceRequired - 1].rules.updatePlayerMoves(socket, moves);
+				});
 			}
 			// Here we collect players inputs
 			socket.on('playerMove', function (moves) {
-				updatePlayerMoves(socket, moves);
+				instancesList[instanceRequired - 1].rules.updatePlayerMoves(socket, moves);
 			});
 		} else {
-			console.log('Serveur dit : l\'accès à l\'instance ' + instanceRequired + ' est refusé, demande faite par ' + socket.id);
+			console.log('Serveur dit : l\'accès à l\'instance ' + instanceRequired + ' est refusé, demande faite par ' + getHandshakeId(socket));
 			socket.emit('redirectToLobby');
 		}
 	}

@@ -61,7 +61,6 @@ window.document.addEventListener('DOMContentLoaded', function () {
 				return true;
 			}
 			if (moves) {
-				console.log(moves);
 				socket.emit('playerMove', moves);
 			}
 		}
@@ -69,23 +68,35 @@ window.document.addEventListener('DOMContentLoaded', function () {
 		window.onkeyup = function(event) {
 			var e = event || window.event;
 			var key = e.which || e.keyCode;
+			var moves;
 
 			switch(key) {
-			case 38 : case 122 : case 119 : case 90 : case 87 : // Fl�che haut, z, w, Z, W
-				// joueur.movingUp = false;
+			case 38 : case 122 : case 119 : case 90 : case 87 : // up, z, w, Z, W
+				moves = {
+					movingUp: false
+				};
 				break;
 
-			case 40 : case 115 : case 83 : // Fl�che bas, s, S
-				// joueur.movingDown = false;
+			case 40 : case 115 : case 83 : // down, s, S
+				moves = {
+					movingDown: false
+				};
 				break;
 
-			case 37 : case 113 : case 97 : case 81 : case 65 : // Fl�che gauche, q, a, Q, A
-				// joueur.movingLeft = false;
+			case 37 : case 113 : case 97 : case 81 : case 65 : // left, q, a, Q, A
+				moves = {
+					movingLeft: false
+				};
 				break;
 
-			case 39 : case 100 : case 68 : // Fl�che droite, d, D
-				// joueur.movingRight = false;
+			case 39 : case 100 : case 68 : // right, d, D
+				moves = {
+					movingRight: false
+				};
 				break;
+			}
+			if (moves) {
+				socket.emit('playerMove', moves);
 			}
 		}
 
@@ -99,6 +110,11 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			// draw players
 			context.fillRect(player1.x, player1.y, player1.width, player1.height);
 			context.fillRect(player2.x, player2.y, player2.width, player2.height);
+
+			// draw players names
+			context.font = "12px Arial";
+			context.fillText(data.player1Name, player1.x, player1.y - 12);
+			context.fillText(data.player2Name, player2.x, player2.y - 12);
 
 			// draw walls
 			for (var i = 0; i < walls.length; i++) {
