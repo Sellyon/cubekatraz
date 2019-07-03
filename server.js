@@ -68,7 +68,6 @@ const getVictoryMessage = function (message) {
 const getHandshakeId = function (socket) {
 	const cookieRegex = /connect.sid\=([^;]+)/g;
 	let userID = cookieRegex.exec(cookieParser.JSONCookies(socket.handshake.headers.cookie));
-	console.log(socket.handshake);
 	if (!userID) {
 		return false
 	}
@@ -608,6 +607,150 @@ serverSocketIO.on('connection', function (socket) {
 const gameRegex = /\Wgame\W\d+$/i;
 const instanceRegex = /\d+$/i;
 const instancesList = [];
+const mainLoop = function (instanceNumber) {
+	setInterval(function() {
+		let collisionHorizontaleDetectee = false;
+		let collisionVerticaleDetectee = false;
+		let player;
+		let walls = instancesList[instanceNumber].rules.walls;
+
+		for (var i = 0; i < 2; i++) {
+			let vecteurX = 0;
+			let vecteurY = 0;
+			if (i === 0) {
+				player = instancesList[instanceNumber].rules.player1;
+			} else {
+				player = instancesList[instanceNumber].rules.player2;
+			}
+
+			if (player.movingLeft) {
+				vecteurX = -8;
+			}
+			if (player.movingRight) {
+				vecteurX = 8;
+			}
+			if (player.movingUp) {
+				vecteurY = -8;
+			}
+			if (player.movingDown) {
+				vecteurY = 8;
+			}
+
+			// canvas border collisions tests
+			// horizontal test
+			if (player.x + vecteurX > 0 && player.x + player.width + vecteurX < instancesList[instanceNumber].rules.levelDimension.width) {
+				collisionHorizontaleDetectee = false;
+			} else {
+				collisionHorizontaleDetectee = true;
+			}
+			// vertical test
+			if (player.y + vecteurY > 0 && player.y + player.height + vecteurY < instancesList[instanceNumber].rules.levelDimension.height) {
+				collisionVerticaleDetectee = false;
+			} else {
+				collisionVerticaleDetectee = true;
+			}
+
+			// test set up collisions
+			for (var j = 0; j < walls.length; j++) {
+				// compraisons between hitbox player and every hitbos set up
+				if (
+					player.y + player.height + vecteurY > walls[j].y
+					&& player.y + vecteurY < walls[j].y + walls[j].height
+					&& player.x + player.width + vecteurX > walls[j].x
+					&& player.x + vecteurX < walls[j].x + walls[j].width
+					) {
+					
+					// If horizontal collision detected, block horizontal moves
+					if (player.y + player.height > walls[j].y && player.y < walls[j].y + walls[j].height) {
+						collisionHorizontaleDetectee = true;
+						// Firewall collisions management
+						if (walls[j].isFire) {
+							console.log('T\'ES MORT !');
+						}
+						// victory management
+						if (walls[j].key) {
+							console.log('victoire !')
+						}
+					}
+					//If vertical collision detected, block vertical moves
+					if (player.x + player.width > walls[j].x && player.x < walls[j].x + walls[j].width) {
+						collisionVerticaleDetectee = true;
+						// Firewall collisions management
+						if (walls[j].isFire) {
+							console.log('T\'ES MORT !');
+						}
+						// victory management
+						if (walls[j].key) {
+							console.log('victoire !')
+						}
+					}
+					// If no collision detected so the player is making a diagonal move
+					if (!collisionHorizontaleDetectee && !collisionVerticaleDetectee) {
+						collisionHorizontaleDetectee = true;
+						collisionVerticaleDetectee = true;
+						// Firewall collisions management
+						if (walls[j].isFire) {
+							document.location.reload(true);
+						}
+						// victory management
+						if (walls[j].key) {
+							console.log('victoire !')
+						}
+					}
+				}
+			}
+
+			// player1 moves
+			if (!collisionHorizontaleDetectee) {
+				player.x += vecteurX;
+			}
+			if (!collisionVerticaleDetectee) {
+				player.y += vecteurY;
+			}
+		}
+
+		// Fire walls moves
+		instancesList[instanceNumber].rules.fireWallsCounter += 0.05;
+		for (var i = 0; i < walls.length; i++) {
+			if (walls[i].isFire) {
+				walls[i].x += Math.sin(instancesList[instanceNumber].rules.fireWallsCounter) * 4
+			}
+		}
+		serverSocketIO.emit('updateFrontElements', {
+			level: instancesList[instanceNumber].level,
+			player1: instancesList[instanceNumber].rules.player1,
+			player1Name: instancesList[instanceNumber].player1Name,
+			player2: instancesList[instanceNumber].rules.player2,
+			player2Name: instancesList[instanceNumber].player2Name,
+			walls: walls
+		});
+	}, 40);
+};
+const updatePlayerMoves = function (socket, moves) {
+	let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
+	let player;
+	if (getHandshakeId(socket) === instancesList[instanceRequired - 1].player1Id) {
+		player = instancesList[instanceRequired - 1].rules.player1;
+	} else if (getHandshakeId(socket) === instancesList[instanceRequired - 1].player2Id) {
+		player = instancesList[instanceRequired - 1].rules.player2;
+	} else {
+		return false
+	}
+	if (player) {
+		if (moves.movingUp === true || moves.movingUp === false) {
+			player.movingUp = moves.movingUp;
+		}
+		if (moves.movingDown === true || moves.movingDown === false) {
+			player.movingDown = moves.movingDown;
+		}
+		if (moves.movingLeft === true || moves.movingLeft === false) {
+			player.movingLeft = moves.movingLeft;
+		}
+		if (moves.movingRight === true || moves.movingRight === false) {
+			player.movingRight = moves.movingRight;
+		}
+	}
+}
 
 const instanceGenerator = function (instanceId) {
 	let rules = 'ERROR RULES NOT CORRECTLY GENERATED !';
@@ -676,150 +819,7 @@ const instanceGenerator = function (instanceId) {
 					key: true
 				}
 			],
-			fireWallsCounter: 0,
-			mainLoop: function (instanceNumber) {
-				setInterval(function() {
-					var collisionHorizontaleDetectee = false;
-					var collisionVerticaleDetectee = false;
-					var player;
-
-					for (var i = 0; i < 2; i++) {
-						var vecteurX = 0;
-						var vecteurY = 0;
-						if (i === 0) {
-							player = rules.player1;
-						} else {
-							player = rules.player2;
-						}
-
-						if (player.movingLeft) {
-							vecteurX = -8;
-						}
-						if (player.movingRight) {
-							vecteurX = 8;
-						}
-						if (player.movingUp) {
-							vecteurY = -8;
-						}
-						if (player.movingDown) {
-							vecteurY = 8;
-						}
-			
-						// canvas border collisions tests
-						// horizontal test
-						if (player.x + vecteurX > 0 && player.x + player.width + vecteurX < rules.levelDimension.width) {
-							collisionHorizontaleDetectee = false;
-						} else {
-							collisionHorizontaleDetectee = true;
-						}
-						// vertical test
-						if (player.y + vecteurY > 0 && player.y + player.height + vecteurY < rules.levelDimension.height) {
-							collisionVerticaleDetectee = false;
-						} else {
-							collisionVerticaleDetectee = true;
-						}
-			
-						// test set up collisions
-						for (var j = 0; j < rules.walls.length; j++) {
-							// compraisons between hitbox player and every hitbos set up
-							if (
-								player.y + player.height + vecteurY > rules.walls[j].y
-								&& player.y + vecteurY < rules.walls[j].y + rules.walls[j].height
-								&& player.x + player.width + vecteurX > rules.walls[j].x
-								&& player.x + vecteurX < rules.walls[j].x + rules.walls[j].width
-								) {
-								
-								// If horizontal collision detected, block horizontal moves
-								if (player.y + player.height > rules.walls[j].y && player.y < rules.walls[j].y + rules.walls[j].height) {
-									collisionHorizontaleDetectee = true;
-									// Firewall collisions management
-									if (rules.walls[j].isFire) {
-										console.log('T\'ES MORT !');
-									}
-									// victory management
-									if (rules.walls[j].key) {
-										console.log('victoire !')
-									}
-								}
-								//If vertical collision detected, block vertical moves
-								if (player.x + player.width > rules.walls[j].x && player.x < rules.walls[j].x + rules.walls[j].width) {
-									collisionVerticaleDetectee = true;
-									// Firewall collisions management
-									if (rules.walls[j].isFire) {
-										console.log('T\'ES MORT !');
-									}
-									// victory management
-									if (rules.walls[j].key) {
-										console.log('victoire !')
-									}
-								}
-								// If no collision detected so the player is making a diagonal move
-								if (!collisionHorizontaleDetectee && !collisionVerticaleDetectee) {
-									collisionHorizontaleDetectee = true;
-									collisionVerticaleDetectee = true;
-									// Firewall collisions management
-									if (rules.walls[j].isFire) {
-										document.location.reload(true);
-									}
-									// victory management
-									if (rules.walls[j].key) {
-										console.log('victoire !')
-									}
-								}
-							}
-						}
-			
-						// player1 moves
-						if (!collisionHorizontaleDetectee) {
-							player.x += vecteurX;
-						}
-						if (!collisionVerticaleDetectee) {
-							player.y += vecteurY;
-						}
-					}
-		
-					// Fire walls moves
-					rules.fireWallsCounter += 0.05;
-					for (var i = 0; i < rules.walls.length; i++) {
-						if (rules.walls[i].isFire) {
-							rules.walls[i].x += Math.sin(rules.fireWallsCounter) * 4
-						}
-					}
-					serverSocketIO.emit('updateFrontElements', {
-						level: instancesList[instanceId].level,
-						player1: rules.player1,
-						player1Name: instancesList[instanceNumber].player1Name,
-						player2: rules.player2,
-						player2Name: instancesList[instanceNumber].player2Name,
-						walls: rules.walls
-					});
-				}, 40);
-			},
-			updatePlayerMoves: function (socket, moves) {
-				let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
-				let player;
-				if (getHandshakeId(socket) === instancesList[instanceRequired - 1].player1Id) {
-					player = rules.player1;
-				} else if (getHandshakeId(socket) === instancesList[instanceRequired - 1].player2Id) {
-					player = rules.player2;
-				} else {
-					return false
-				}
-				if (player) {
-					if (moves.movingUp === true || moves.movingUp === false) {
-						player.movingUp = moves.movingUp;
-					}
-					if (moves.movingDown === true || moves.movingDown === false) {
-						player.movingDown = moves.movingDown;
-					}
-					if (moves.movingLeft === true || moves.movingLeft === false) {
-						player.movingLeft = moves.movingLeft;
-					}
-					if (moves.movingRight === true || moves.movingRight === false) {
-						player.movingRight = moves.movingRight;
-					}
-				}
-			}
+			fireWallsCounter: 0
 		};
 	}
 	return rules;
@@ -832,7 +832,7 @@ serverSocketIO.on('connection', function (socket) {
 			console.log('Serveur dit : Connecté au navigateur, dans la partie '+ instanceRequired + ', demande faite par ' + getHandshakeId(socket));
 			if (true && !instancesList[instanceRequired - 1].rules.levelStarted) {
 				instancesList[instanceRequired - 1].rules.levelStarted = true;
-				instancesList[instanceRequired - 1].rules.mainLoop(instanceRequired - 1);
+				mainLoop(instanceRequired - 1);
 				console.log('level ' + instanceRequired + ' started');
 				socket.on('updatePlayerList', function (moves) {
 					playerList[instanceRequired - 1].rules.updatePlayerMoves(socket, moves);
@@ -840,7 +840,7 @@ serverSocketIO.on('connection', function (socket) {
 			}
 			// Here we collect players inputs
 			socket.on('playerMove', function (moves) {
-				instancesList[instanceRequired - 1].rules.updatePlayerMoves(socket, moves);
+				updatePlayerMoves(socket, moves);
 			});
 		} else {
 			console.log('Serveur dit : l\'accès à l\'instance ' + instanceRequired + ' est refusé, demande faite par ' + getHandshakeId(socket));

@@ -8,8 +8,8 @@ window.onload = function() {
 	var joueur = {
 		x: 50,
 		y: 50,
-		width: 100,
-		height: 100,
+		width: 50,
+		height: 50,
 		movingLeft: false,
 		movingRight: false,
 		movingUp: false,
@@ -17,42 +17,77 @@ window.onload = function() {
 	}
 
 	var murs = [
-	mur1 = {
-		x: 200,
+	{
+		x: 375,
 		y: 0,
 		width: 50,
 		height: 350,
+		color: "black",
 		deFeu: false,
 	},
-	mur2 = {
-		x: 400,
-		y: 150,
-		width: 50,
-		height: 350,
-		deFeu: false,
-	},
-	mur3 = {
-		x: 600,
-		y: 0,
-		width: 50,
-		height: 350,
-		deFeu: false,
-	},
-	mur4 = {
-		x: 215,
+	{
+		x: 0,
 		y: 200,
 		width: 250,
 		height: 50,
-		deFeu: true,
-	},
-	mur5 = {
-		x: 700,
-		y: 50,
-		width: 50,
-		height: 50,
+		color: "black",
 		deFeu: false,
-		clef: true
-	}];
+	},
+	{
+		x: 550,
+		y: 200,
+		width: 250,
+		height: 50,
+		color: "black",
+		deFeu: false,
+	},
+	{
+		x: 50,
+		y: 250,
+		width: 50,
+		height: 100,
+		color: "black",
+		deFeu: false,
+	},
+	{
+		x: 150,
+		y: 250,
+		width: 50,
+		height: 100,
+		color: "black",
+		deFeu: false,
+	},
+	{
+		x: 600,
+		y: 250,
+		width: 50,
+		height: 100,
+		deFeu: false,
+	},
+	{
+		x: 700,
+		y: 250,
+		width: 50,
+		height: 100,
+		color: "black",
+		deFeu: false,
+	},
+	];
+	var doors = [
+		{
+			x: 250,
+			y: 200,
+			width: 150,
+			height: 50,
+			color: "blue",
+			isDoor : {
+				horizMaxPot: 75,
+				xGauge: 75,
+				vertMaxPot: 0,
+				yGauge: 0
+			}
+		}
+	]
 
 	var compteurMursDeFeu = 0;
 
@@ -218,18 +253,13 @@ window.onload = function() {
 			}
 
 			// dessiner rectangle joueur
+			context.fillStyle = "black";
 			context.fillRect(joueur.x, joueur.y, joueur.width, joueur.height);
 
 			// dessiner murs
 			for (var i = 0; i < murs.length; i++) {
-				if (murs[i].deFeu) {
-					context.fillStyle = "red";
-				}
-				if (murs[i].clef) {
-					context.fillStyle = "yellow";
-				}
+				context.fillStyle = murs[i].color;
 				context.fillRect(murs[i].x, murs[i].y, murs[i].width, murs[i].height);
-				context.fillStyle = "black";
 			}
 		}, 40);
 	}());

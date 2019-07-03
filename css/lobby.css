@@ -27,6 +27,18 @@ p {
     vertical-align: top;
 }
 
+#aside ul li {
+	list-style: none;
+}
+
+#aside ul li a {
+	text-decoration:none;
+}
+
+#aside ul li:hover{
+	border-right : 2px solid #5C302A;
+}
+
 nav{
 	width : 80%;
 	margin : 0 auto;
