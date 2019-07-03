@@ -15,11 +15,13 @@ window.document.addEventListener('DOMContentLoaded', function () {
 		var canvas = document.getElementById('canvas');
 		var context = canvas.getContext('2d');
 		canvas.width = 800;
-		canvas.height = 500;
+		canvas.height = 600;
 
 		var player1;
 		var player2;
 		var walls;
+		var finishZone;
+		var instanceCounter;
 
 		var levelTitle = document.getElementById('levelTitle');
 
@@ -106,6 +108,8 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			player1 = data.player1;
 			player2 = data.player2;
 			walls = data.walls;
+			instanceCounter = data.instanceCounter;
+			finishZone = data.finishZone;
 
 			// update level title
 			if (data.level === 1) {
@@ -125,15 +129,16 @@ window.document.addEventListener('DOMContentLoaded', function () {
 
 			// draw walls
 			for (var i = 0; i < walls.length; i++) {
-				if (walls[i].isFire) {
-					context.fillStyle = "red";
-				}
-				if (walls[i].key) {
-					context.fillStyle = "yellow";
-				}
+				context.fillStyle = walls[i].color;
 				context.fillRect(walls[i].x, walls[i].y, walls[i].width, walls[i].height);
-				context.fillStyle = "black";
+				context.fillStyle = 'black';
 			}
+
+			// draw finish zone
+			var opacityFinishZone = (Math.sin(instanceCounter / 5) + 1) / 2;
+			context.fillStyle = 'rgba(232, 209, 35, 91, ' + opacityFinishZone + ')';
+			context.fillRect(finishZone.x, finishZone.y, 100, 100);
+			context.fillStyle = 'black';
 		});
 	});
 });

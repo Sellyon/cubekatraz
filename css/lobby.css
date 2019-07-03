@@ -7,6 +7,7 @@ body{
 	background-color : #EBC193;
 	color : #5C302A;
 	font-family: 'Special Elite', cursive;
+	text-align: center;
 }
 a:visited{
 	color: #5C3060;
@@ -16,74 +17,56 @@ p {
 	font-family: Arial, Helvetica, sans-serif; 
 }
 
-#nav{
+nav{
+	width : 100%;
+	margin : 0 auto;
+	height: 50px;
+	text-align: left;
 	border : 1px solid #5C302A;
 	background-color: bisque;
 	padding: 5;
 }
 
-#aside {
+nav div ul li {
 	display: inline-block;
-    vertical-align: top;
-}
-
-#aside ul li {
-	list-style: none;
-}
-
-#aside ul li a {
-	text-decoration:none;
-}
-
-#aside ul li:hover{
-	border-right : 2px solid #5C302A;
-}
-
-nav{
-	width : 80%;
-	margin : 0 auto;
-	height: 50px;
+	width: 20%;
 	text-align: center;
-}
-
-nav ul li {
-	display: inline-block;
-	width: 12%;
 	border : 2px solid transparent;
 }
-nav ul li:hover{
+nav div ul li:hover{
 	border-bottom : 2px solid #5C302A;
 }
-nav ul li a {
+nav div ul li a {
 	text-decoration:none;
 }
 
+#navigation{
+	text-align: left;
+    width: 45%;
+    display: inline-block;
+}
+
+/*****User management *****/
+#userManage{
+	text-align: right;
+    width: 45%;
+    display: inline-block;
+}
+
+#profil{
+	width: 10%;
+    display: inline-block;
+}
+
+/****** Game *****/
 #main{
 	width : 70%;
 	margin : 0 auto;
 	padding: 25;
 	text-align: center;
-	display: inline-block;
 }
 #main p{
 	margin: 10px;
-}
-
-/*****User management *****/
-
-#userManage{
-	width : 150px;
-	height : 200px;
-	border : 1px solid #5C302A;
-	background-color: bisque;
-	/* position: fixed; */
-	left : 0px;
-	top : 200px;
-	padding: 10;
-}
-
-#userManage ul li {
-	margin-bottom: 20;
 }
 
 #indexButton {
@@ -101,49 +84,80 @@ nav ul li a {
 	height: 100%;
 }
 
-#lobbyWelcome{
-	margin-bottom: 80;
+/**** Lobby ****/
+
+#lobbySideLeft{
+	width: 20%;
+	display: inline-block;
+	box-sizing: border-box;
+	height: 100%;
+	border-right: 1px solid #5C302A;
+	background-color: #e0c09a;
 }
 
 #lobbyAntichamber {
-	margin-bottom: 80;
+	width: 60%;
+	display: inline-block;
+	box-sizing: border-box;
+	vertical-align: top;
+	padding: 15;
+	height: 100%;
+	border-right: 1px solid #5C302A;
+	background-image: url("/images/texture.png");
+	background-size: contain;
+}
+
+#lobbyChat {
+	width: 20%;
+	display: inline-block;
+	box-sizing: border-box;
+	vertical-align: top;
+	height: 100%;
+	background-color: #e0c09a;
 }
 
 #chatBox {
-	height: 200px;
+	height: 60%;
 	width: 100%;
-	border: 1px solid #5C302A;
 	background-color: bisque;
 	overflow: auto;
+	text-align: left;
+}
+
+#chatBox  p:nth-child(even) {
+	background-color: #e0c09a;
+}
+
+#chatBox  p{
+	padding-left: 5;
+	padding-right: 5;
+	padding-top: 1;
+	padding-bottom: 1;
 }
 
 #lobbyConnectedPlayers {
-	width: 40%;
-	display: inline-block;
+	width: 100%;
 }
 
 #connectedPlayers {
 	height: 200px;
-	width: 90%;
-	margin: 25;
+	width: 100%;
 	border: 1px solid #5C302A;
-	background-color: bisque;
 	overflow: auto;
+	text-align: left;
 }
 
 #lobbyCurrentMatches {
-	width: 40%;
-	display: inline-block;
+	width: 100%;
 }
 
 #currentMatches {
 	height: 200px;
-	width: 90%;
-	margin: 25;
+	width: 100%;
 	border: 1px solid #5C302A;
-	background-color: bisque;
 	overflow: auto;
 	display: inline-block;
+	text-align: left;
 }
 
 #antichamberAdder {
@@ -151,7 +165,8 @@ nav ul li a {
     height: 50;
     font-size: 20;
     color: bisque;
-    background-color: #5C302A;
+	background-color: #5C302A;
+	margin: 10;
 }
 
 #slotPlayer1{
@@ -196,11 +211,6 @@ nav ul li a {
 	display: inline-block;
 	font-family: 'Special Elite', cursive;
 	font-size: 10em;
-}
-
-#lobbyChat {
-	margin-top: 80;
-	margin-bottom: 80;
 }
 
 #oneHOFMatch {

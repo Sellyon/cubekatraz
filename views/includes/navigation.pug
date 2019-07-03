@@ -1,10 +1,5 @@
-div#nav
-  div#profil
-    p
-      | Profil : 
-      span
-        = profil
-  nav
+nav
+  div#navigation
     ul
       li
         a(href='/') ACCUEIL
@@ -14,7 +9,6 @@ div#nav
         a(href='/hallOfFame') PANTHEON
       li
         a(href='http://yoannmroz.yj.fr/') PORTFOLIO
-div#aside
   div#userManage
     ul 
       li
@@ -23,5 +17,8 @@ div#aside
         a(href='/login') Se connecter 
       li
         a(href='/profil') Profil
-
-  
+  div#profil
+    p
+      | Profil : 
+      span
+        = profil

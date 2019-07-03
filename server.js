@@ -710,18 +710,21 @@ const mainLoop = function (instanceNumber) {
 		}
 
 		// Fire walls moves
-		instancesList[instanceNumber].rules.fireWallsCounter += 0.05;
+		instancesList[instanceNumber].rules.instanceCounter += 0.05;
 		for (var i = 0; i < walls.length; i++) {
 			if (walls[i].isFire) {
-				walls[i].x += Math.sin(instancesList[instanceNumber].rules.fireWallsCounter) * 4
+				walls[i].x += Math.sin(instancesList[instanceNumber].rules.instanceCounter) * 4
 			}
 		}
+
 		serverSocketIO.emit('updateFrontElements', {
 			level: instancesList[instanceNumber].level,
 			player1: instancesList[instanceNumber].rules.player1,
 			player1Name: instancesList[instanceNumber].player1Name,
 			player2: instancesList[instanceNumber].rules.player2,
 			player2Name: instancesList[instanceNumber].player2Name,
+			instanceCounter: instancesList[instanceNumber].rules.instanceCounter,
+			finishZone: instancesList[instanceNumber].rules.finishZone,
 			walls: walls
 		});
 	}, 40);
@@ -759,7 +762,11 @@ const instanceGenerator = function (instanceId) {
 			levelStarted: false,
 			levelDimension: {
 				width: 800,
-				height: 500
+				height: 600
+			},
+			finishZone: {
+				x: 350,
+				y: 500
 			},
 			player1: {
 				x: 50,
@@ -772,8 +779,8 @@ const instanceGenerator = function (instanceId) {
 				movingDown: false,
 			},
 			player2: {
-				x: 50,
-				y: 300,
+				x: 700,
+				y: 50,
 				width: 50,
 				height: 50,
 				movingLeft: false,
@@ -783,43 +790,134 @@ const instanceGenerator = function (instanceId) {
 			},
 			walls: [
 				{
-					x: 200,
+					x: 350,
 					y: 0,
-					width: 50,
-					height: 350,
+					width: 100,
+					height: 400,
+					color: "black",
 					isFire: false,
 				},
 				{
-					x: 400,
-					y: 150,
-					width: 50,
-					height: 350,
-					isFire: false,
-				},
-				{
-					x: 600,
-					y: 0,
-					width: 50,
-					height: 350,
-					isFire: false,
-				},
-				{
-					x: 215,
-					y: 200,
+					x: 0,
+					y: 250,
 					width: 250,
 					height: 50,
-					isFire: true,
+					color: "black",
+					isFire: false,
 				},
 				{
-					x: 700,
-					y: 50,
+					x: 550,
+					y: 250,
+					width: 250,
+					height: 50,
+					color: "black",
+					isFire: false,
+				},
+				{
+					x: 0,
+					y: 300,
+					width: 50,
+					height: 100,
+					color: "black",
+					isFire: false,
+				},
+				{
+					x: 100,
+					y: 300,
+					width: 50,
+					height: 100,
+					color: "black",
+					isFire: false,
+				},
+				{
+					x: 200,
+					y: 300,
+					width: 50,
+					height: 100,
+					color: "black",
+					isFire: false,
+				},
+				{
+					x: 550,
+					y: 300,
+					width: 50,
+					height: 100,
+					isFire: false,
+				},
+				{
+					x: 650,
+					y: 300,
+					width: 50,
+					height: 100,
+					color: "black",
+					isFire: false,
+				},
+				{
+					x: 750,
+					y: 300,
+					width: 50,
+					height: 100,
+					color: "black",
+					isFire: false,
+				},
+				{
+					x: 250,
+					y: 250,
 					width: 50,
 					height: 50,
+					color: "blue",
 					isFire: false,
-					key: true
+					isDoor : {
+						horizMaxPot: 75,
+						xGauge: 75,
+						vertMaxPot: 0,
+						yGauge: 0
+					}
+				},
+				{
+					x: 300,
+					y: 250,
+					width: 50,
+					height: 150,
+					color: "blue",
+					isFire: false,
+					isDoor : {
+						horizMaxPot: 75,
+						xGauge: 75,
+						vertMaxPot: 0,
+						yGauge: 0
+					}
+				},
+				{
+					x: 450,
+					y: 250,
+					width: 50,
+					height: 150,
+					color: "blue",
+					isFire: false,
+					isDoor : {
+						horizMaxPot: 75,
+						xGauge: 75,
+						vertMaxPot: 0,
+						yGauge: 0
+					}
+				},
+				{
+					x: 500,
+					y: 250,
+					width: 50,
+					height: 50,
+					color: "blue",
+					isFire: false,
+					isDoor : {
+						horizMaxPot: 75,
+						xGauge: 75,
+						vertMaxPot: 0,
+						yGauge: 0
+					}
 				}
 			],
-			fireWallsCounter: 0
+			instanceCounter: 0
 		};
 	}
 	return rules;
