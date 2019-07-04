@@ -2,8 +2,8 @@
 window.document.addEventListener('DOMContentLoaded', function () {
 
 	// web socket stuff
-    var socket = io('https://two-prisoners.herokuapp.com/');
-    //var socket = io('http://localhost:8080/');
+    //var socket = io('https://two-prisoners.herokuapp.com/');
+    var socket = io('http://localhost:8080/');
 
     socket.on('connect', function () {
     	console.log('Navigateur dit : Connect� au serveur');
@@ -118,21 +118,30 @@ window.document.addEventListener('DOMContentLoaded', function () {
 
 			context.clearRect(0, 0, canvas.width, canvas.height);
 
+			// draw background
+			context.fillStyle = '#D9D1D7';
+			context.fillRect(0, 0, canvas.width, canvas.height);
+
 			// draw players
 			let avatar;
+			let player;
 			for (var i = 0; i < 2; i++) {
 				if (i === 0) {
 					avatar = data.player1Avatar;
+					player = player1;
 				} else {
 					avatar = data.player2Avatar;
+					player = player2;
 				}
 				for (var j = 0; j < avatar.length; j++) {
-					context.fillRect(avatar[j].x, avatar[j].y, avatar[j].width, avatar[j].height);
+					context.fillStyle = avatar[j].color;
+					context.fillRect(player.x + avatar[j].x, player.y + avatar[j].y, avatar[j].width, avatar[j].height);
 				}
 			}
 
 			// draw players names
-			context.font = "12px Arial";
+			context.fillStyle = 'black';
+			context.font = '12px Arial';
 			context.fillText(data.player1Name, player1.x, player1.y - 12);
 			context.fillText(data.player2Name, player2.x, player2.y - 12);
 
@@ -144,10 +153,16 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			// draw finish zone
-			var opacityFinishZone = (Math.sin(instanceCounter / 5) + 1) / 2;
-			context.fillStyle = 'rgba(232, 209, 35, 91, ' + opacityFinishZone + ')';
-			context.fillRect(finishZone.x, finishZone.y, 100, 100);
-			context.fillStyle = 'black';
+			var opacityFinishZone = (Math.sin(instanceCounter / 1) + 1) / 2;
+			context.beginPath();
+			context.lineWidth = '6';
+			context.strokeStyle = 'red';
+			context.strokeStyle = 'rgba(255, 154, 63, ' + opacityFinishZone + ')';
+			context.rect(finishZone.x, finishZone.y, 100, 100); 
+			context.stroke();
+			context.fillStyle = '#FF9A3F';
+			context.font = '24px Arial';
+			context.fillText('SORTIE', finishZone.x + 5, finishZone.y + 60);
 		});
 	});
 });
