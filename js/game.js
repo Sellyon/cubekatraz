@@ -2,8 +2,8 @@
 window.document.addEventListener('DOMContentLoaded', function () {
 
 	// web socket stuff
-    //var socket = io('https://two-prisoners.herokuapp.com/');
-    var socket = io('http://localhost:8080/');
+    var socket = io('https://two-prisoners.herokuapp.com/');
+    //var socket = io('http://localhost:8080/');
 
     socket.on('connect', function () {
     	console.log('Navigateur dit : Connect� au serveur');
@@ -119,8 +119,17 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			context.clearRect(0, 0, canvas.width, canvas.height);
 
 			// draw players
-			context.fillRect(player1.x, player1.y, player1.width, player1.height);
-			context.fillRect(player2.x, player2.y, player2.width, player2.height);
+			let avatar;
+			for (var i = 0; i < 2; i++) {
+				if (i === 0) {
+					avatar = data.player1Avatar;
+				} else {
+					avatar = data.player2Avatar;
+				}
+				for (var j = 0; j < avatar.length; j++) {
+					context.fillRect(avatar[j].x, avatar[j].y, avatar[j].width, avatar[j].height);
+				}
+			}
 
 			// draw players names
 			context.font = "12px Arial";

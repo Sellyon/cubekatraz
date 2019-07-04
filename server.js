@@ -105,6 +105,9 @@ app.set('view engine', 'pug');
 app.set('views','./views');
 
 app.get('/', function(req, res) {
+	if (req.session.user) {
+		res.redirect('/lobby');
+	}
     res.render('index', { profil: getUserName(req), title: 'index', message: getUserName(req)});
 })
 
@@ -336,7 +339,104 @@ let updateAntichamberStatus = function () {
 	serverSocketIO.emit('updateAntichamberStatusBack', antichamberStatusText);
 };
 
-let initiateEvasionCountDown = function () {
+const getCubeAvatar = function (image) {
+	if (image === 'rick.jpg') {
+		return [
+		{
+			x: 0,
+			y: 0,
+			width: 50,
+			height: 20,
+			color: '#FF6600'
+		},
+		{
+			x: 0,
+			y: 20,
+			width: 50,
+			height: 30,
+			color: '#BADEEE'
+		}
+		]
+	} else if (image === 'cody.jpg') {
+		return [
+		{
+			x: 0,
+			y: 0,
+			width: 50,
+			height: 10,
+			color: '#E5ECF4'
+		},
+		{
+			x: 0,
+			y: 10,
+			width: 50,
+			height: 10,
+			color: '#4C5EC8'
+		},
+		{
+			x: 0,
+			y: 20,
+			width: 50,
+			height: 10,
+			color: '#E5ECF4'
+		},
+		{
+			x: 0,
+			y: 30,
+			width: 50,
+			height: 10,
+			color: '#4C5EC8'
+		},
+		{
+			x: 0,
+			y: 40,
+			width: 50,
+			height: 10,
+			color: '#E5ECF4'
+		}
+		]
+	} else {
+		return [
+		{
+			x: 0,
+			y: 0,
+			width: 50,
+			height: 10,
+			color: '#FFE80E'
+		},
+		{
+			x: 0,
+			y: 10,
+			width: 50,
+			height: 10,
+			color: '#090901'
+		},
+		{
+			x: 0,
+			y: 20,
+			width: 50,
+			height: 10,
+			color: '#FFE80E'
+		},
+		{
+			x: 0,
+			y: 30,
+			width: 50,
+			height: 10,
+			color: '#090901'
+		},
+		{
+			x: 0,
+			y: 40,
+			width: 50,
+			height: 10,
+			color: '#FFE80E'
+		}
+		]
+	}
+}
+
+const initiateEvasionCountDown = function () {
 	if (!countDownStarted) {
 		let countDownValue = 125; // 125*40(intervals) = 5 seconds
 		let countDownText;
@@ -354,10 +454,12 @@ let initiateEvasionCountDown = function () {
 						player1Id: avatarSlot1.status,
 						player1Name: avatarSlot1.name,
 						player1Image: avatarSlot1.image,
+						player1Avatar: getCubeAvatar(avatarSlot1.image),
 						player1Score: 0,
 						player2Id: avatarSlot2.status,
 						player2Name: avatarSlot2.name,
 						player2Image: avatarSlot2.image,
+						player2Avatar: getCubeAvatar(avatarSlot2.image),
 						player2Score: 0,
 						level: 1,
 						active: true
@@ -721,8 +823,10 @@ const mainLoop = function (instanceNumber) {
 			level: instancesList[instanceNumber].level,
 			player1: instancesList[instanceNumber].rules.player1,
 			player1Name: instancesList[instanceNumber].player1Name,
+			player1Avatar: instancesList[instanceNumber].player1Avatar,
 			player2: instancesList[instanceNumber].rules.player2,
 			player2Name: instancesList[instanceNumber].player2Name,
+			player2Avatar: instancesList[instanceNumber].player2Avatar,
 			instanceCounter: instancesList[instanceNumber].rules.instanceCounter,
 			finishZone: instancesList[instanceNumber].rules.finishZone,
 			walls: walls

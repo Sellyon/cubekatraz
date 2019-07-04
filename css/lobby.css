@@ -22,8 +22,8 @@ nav{
 	margin : 0 auto;
 	height: 50px;
 	text-align: left;
-	border : 1px solid #5C302A;
-	background-color: bisque;
+	border : 1px solid #EEE2B2;
+	background-color: #eac08e;
 	padding: 5;
 }
 
@@ -90,8 +90,8 @@ nav div ul li a {
 	width: 20%;
 	display: inline-block;
 	box-sizing: border-box;
-	height: 100%;
-	border-right: 1px solid #5C302A;
+	height: 80%;
+	border-right: 1px solid #EEE2B2;
 	background-color: #e0c09a;
 }
 
@@ -101,8 +101,8 @@ nav div ul li a {
 	box-sizing: border-box;
 	vertical-align: top;
 	padding: 15;
-	height: 100%;
-	border-right: 1px solid #5C302A;
+	height: 80%;
+	border-right: 1px solid #EEE2B2;
 	background-image: url("/images/texture.png");
 	background-size: contain;
 }
@@ -112,7 +112,7 @@ nav div ul li a {
 	display: inline-block;
 	box-sizing: border-box;
 	vertical-align: top;
-	height: 100%;
+	height: 80%;
 	background-color: #e0c09a;
 }
 
@@ -137,27 +137,38 @@ nav div ul li a {
 
 #lobbyConnectedPlayers {
 	width: 100%;
+	height: 50%;
+}
+
+#lobbyConnectedPlayersTexts {
+	height: 30%;
 }
 
 #connectedPlayers {
-	height: 200px;
+	height: 70%;
 	width: 100%;
-	border: 1px solid #5C302A;
+	border-bottom: 1px solid #EEE2B2;
 	overflow: auto;
 	text-align: left;
+	padding-left: 5px;
+}
+
+#lobbyCurrentMatchesTexts{
+	height: 30%;
 }
 
 #lobbyCurrentMatches {
 	width: 100%;
+	height: 50%;
 }
 
 #currentMatches {
-	height: 200px;
+	height: 70%;
 	width: 100%;
-	border: 1px solid #5C302A;
 	overflow: auto;
 	display: inline-block;
 	text-align: left;
+	padding-left: 5px;
 }
 
 #antichamberAdder {
@@ -180,11 +191,11 @@ nav div ul li a {
 }
 
 #avatarPlayer1{
-	border: 1px solid #5C302A;
+	border: 1px solid #EEE2B2;
 }
 
 #avatarPlayer2{
-	border: 1px solid #5C302A;
+	border: 1px solid #EEE2B2;
 }
 
 #player1AvatarSelect {
@@ -217,7 +228,7 @@ nav div ul li a {
 	width: 90%;
 	margin: 5;
     padding: 10;
-	border: 1px solid #5C302A;
+	border: 1px solid #EEE2B2;
 	background-color: bisque;
 	text-align: left;
     list-style: none;
