@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 var router = express.Router();
+const routMod = require(__dirname + '/routerModules/routerModule.js');
 const uri = "mongodb+srv://yoannmroz:Ech1ariandre@cluster0-bznsv.mongodb.net/test?retryWrites=true&w=majority";
 const secret = '123456789SECRET';
 
@@ -21,24 +22,11 @@ router.use(session({
 	resave: false
 }));
 
-const getUserName = function (req) {
-	if (req.session && req.session.user) {
-		return req.session.user
-	} else {
-		return 'mysterieux inconnu'
-	}
-}
-
-
-/**
- * Page d'accueil
-*/
-
 router.get('/', function(req, res) {
 	if (req.session && req.session.user) {
 		res.redirect('/lobby');
 	}
-    res.render('index', { profil: getUserName(req), title: 'index', message: getUserName(req)});
+    res.render('index', { profil: routMod.getUserName(req), title: 'index', message: routMod.getUserName(req)});
 });
 
 // Autres routes

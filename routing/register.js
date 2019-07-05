@@ -3,19 +3,12 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const MongoClient = require('mongodb').MongoClient;
 const objectId = require('mongodb').ObjectID;
-const client = require(__dirname + '/dbs/db.js');
+const client = require(__dirname + '/routerModules/db.js');
+const routMod = require(__dirname + '/routerModules/routerModule.js');
 const uri = "mongodb+srv://yoannmroz:Ech1ariandre@cluster0-bznsv.mongodb.net/test?retryWrites=true&w=majority";
 const secret = '123456789SECRET';
 var myDB;
 var router = express.Router();
-
-const getUserName = function (req) {
-	if (req.session && req.session.user) {
-		return req.session.user
-	} else {
-		return 'mysterieux inconnu'
-	}
-}
 
 const store = new MongoDBStore({
 	uri: uri,
@@ -37,9 +30,9 @@ router.use(session({
 router.get('/', function(req, res) {
 	let message = 'Complétez le formulaire pour vous enregistrer.'
 	if (req.session && req.session.user) {
-		message = getUserName(req) + ', vous êtes déjà enregistré :)'
+		message = routMod.getUserName(req) + ', vous êtes déjà enregistré :)'
 	}
-	res.render('register', { profil: getUserName(req), title: 'login', message: message});
+	res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message});
 })
 
 router.post('/', function(req, res) {
@@ -70,13 +63,13 @@ router.post('/', function(req, res) {
 					if (err) throw err;
 					console.log("1 document inserted");
 					req.session.user = login;
-					message = 'enregistrement réussie ' + getUserName(req) + ', bienvenu à Cubekatraz :)';
-					res.render('register', { profil: getUserName(req), title: 'login', message: message});
+					message = 'enregistrement réussie ' + routMod.getUserName(req) + ', bienvenu à Cubekatraz :)';
+					res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message});
 					client.close();
 				});
 			} else {
 			  	message = 'Ce pseudo est déjà utilisé, choisis-en un autre.';
-			  	res.render('register', { profil: getUserName(req), title: 'login', message: message});
+			  	res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message});
 			  	client.close();
 			}
 		});

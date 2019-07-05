@@ -22,6 +22,7 @@ window.document.addEventListener('DOMContentLoaded', function () {
 		var walls;
 		var finishZone;
 		var instanceCounter;
+		var switches;
 
 		var levelTitle = document.getElementById('levelTitle');
 
@@ -105,11 +106,12 @@ window.document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		socket.addEventListener('updateFrontElements', function(data){
-			player1 = data.player1;
-			player2 = data.player2;
-			walls = data.walls;
-			instanceCounter = data.instanceCounter;
-			finishZone = data.finishZone;
+			player1 = data.rules.player1;
+			player2 = data.rules.player2;
+			walls = data.rules.walls;
+			switches = data.rules.switches;
+			instanceCounter = data.rules.instanceCounter;
+			finishZone = data.rules.finishZone;
 
 			// update level title
 			if (data.level === 1) {
@@ -121,6 +123,30 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			// draw background
 			context.fillStyle = '#D9D1D7';
 			context.fillRect(0, 0, canvas.width, canvas.height);
+
+			// draw walls
+			for (var i = 0; i < walls.length; i++) {
+				context.fillStyle = walls[i].color;
+				context.fillRect(walls[i].x, walls[i].y, walls[i].width, walls[i].height);
+			}
+
+			// draw switches
+			for (var i = 0; i < switches.length; i++) {
+				context.fillStyle = switches[i].color;
+				context.fillRect(switches[i].x, switches[i].y, switches[i].width, switches[i].height);
+			}
+
+			// draw finish zone
+			var opacityFinishZone = (Math.sin(instanceCounter / 1) + 1) / 2;
+			context.beginPath();
+			context.lineWidth = '6';
+			context.strokeStyle = 'red';
+			context.strokeStyle = 'rgba(255, 154, 63, ' + opacityFinishZone + ')';
+			context.rect(finishZone.x, finishZone.y, 100, 100); 
+			context.stroke();
+			context.fillStyle = '#FF9A3F';
+			context.font = '24px Arial';
+			context.fillText('SORTIE', finishZone.x + 5, finishZone.y + 60);
 
 			// draw players
 			let avatar;
@@ -144,25 +170,6 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			context.font = '12px Arial';
 			context.fillText(data.player1Name, player1.x, player1.y - 12);
 			context.fillText(data.player2Name, player2.x, player2.y - 12);
-
-			// draw walls
-			for (var i = 0; i < walls.length; i++) {
-				context.fillStyle = walls[i].color;
-				context.fillRect(walls[i].x, walls[i].y, walls[i].width, walls[i].height);
-				context.fillStyle = 'black';
-			}
-
-			// draw finish zone
-			var opacityFinishZone = (Math.sin(instanceCounter / 1) + 1) / 2;
-			context.beginPath();
-			context.lineWidth = '6';
-			context.strokeStyle = 'red';
-			context.strokeStyle = 'rgba(255, 154, 63, ' + opacityFinishZone + ')';
-			context.rect(finishZone.x, finishZone.y, 100, 100); 
-			context.stroke();
-			context.fillStyle = '#FF9A3F';
-			context.font = '24px Arial';
-			context.fillText('SORTIE', finishZone.x + 5, finishZone.y + 60);
 		});
 	});
 });

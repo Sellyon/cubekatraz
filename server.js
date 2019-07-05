@@ -15,68 +15,10 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const MongoClient = require('mongodb').MongoClient;
 const objectId = require('mongodb').ObjectID;
 const client = require(__dirname + '/dbs/db.js');
+const cubekat = require(__dirname + '/myModules/cubekatrazModule.js');
 const uri = "mongodb+srv://yoannmroz:Ech1ariandre@cluster0-bznsv.mongodb.net/test?retryWrites=true&w=majority";
 
 var myDB;
-
-const convertDateNowToEuropeanDate = function (date) {
-	date = new Date(date * 1000);
-	return date
-}
-
-const msToTime = function(duration) {
-    let milliseconds = parseInt((duration%1000)/100)
-        , seconds = parseInt((duration/1000)%60)
-        , minutes = parseInt((duration/(1000*60))%60)
-        , hours = parseInt((duration/(1000*60*60))%24);
-
-    hours = (hours < 10) ? "0" + hours : hours;
-    minutes = (minutes < 10) ? "0" + minutes : minutes;
-    seconds = (seconds < 10) ? "0" + seconds : seconds;
-
-    return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
-}
-
-function requireLogin (req, res, next) {
-  if (req.session.user) {
-    // User is authenticated, let him in
-    next();
-  } else {
-    // Otherwise, we redirect him to login form
-    res.redirect("/login");
-  }
-}
-
-const getUserName = function (req) {
-	if (req.session.user) {
-		return req.session.user
-	} else {
-		return 'mysterieux inconnu'
-	}
-}
-
-const getVictoryMessage = function (message) {
-	if (message) {
-		message = 'oui';
-	} else {
-		message = 'non';
-	}
-	return message
-}
-
-const getHandshakeId = function (socket) {
-	const cookieRegex = /connect.sid\=([^;]+)/g;
-	let userID = cookieRegex.exec(cookieParser.JSONCookies(socket.handshake.headers.cookie));
-	if (!userID) {
-		return false
-	}
-	userID = userID[0].substr(12, userID[0].length);
-	if (userID) {
-		return userID;
-	} else {
-		return false
-	}
-}
 
 app.locals.basedir = path.join(__dirname, '/views/includes');
 
@@ -138,229 +80,24 @@ let updateFrontPlayerList = function () {
 	serverSocketIO.emit('updatePlayerList', playerList);
 };
 
-let updateAvatarslots = function (socket) {
-	var target = serverSocketIO;
-	if (socket) {
-		target = socket;
-	}
-	target.emit('updateFrontAvatarslots', {
-		slot1: {
-			avatarSlot1: 'images/portraits/' + avatarSlot1.image,
-			status: avatarSlot1.status,
-			name: avatarSlot1.name
-		},
-		slot2: {
-			avatarSlot2: 'images/portraits/' + avatarSlot2.image,
-			status: avatarSlot2.status,
-			name: avatarSlot2.name
-		}
-	});
-};
-
-let updateAntichamberStatus = function () {
-	var antichamberStatusText;
-	if (avatarSlot1.status === 'empty' && avatarSlot2.status === 'empty') {
-		antichamberStatusText = 'Aucun prisonnier n\'est sur le point de s\'évader';
-	} else if ((avatarSlot1.status !== 'empty' && avatarSlot2.status === 'empty') || (avatarSlot1.status === 'empty' && avatarSlot2.status !== 'empty')) {
-		antichamberStatusText = 'Un prisonnier veut s\'échapper';
-	} else {
-		antichamberStatusText = 'Evasion imminente !';
-	}
-	serverSocketIO.emit('updateAntichamberStatusBack', antichamberStatusText);
-};
-
-const getCubeAvatar = function (image) {
-	if (image === 'rick.jpg') {
-		return [
-		{
-			x: 0,
-			y: 0,
-			width: 50,
-			height: 20,
-			color: '#BADEEE'
-		},
-		{
-			x: 0,
-			y: 20,
-			width: 50,
-			height: 30,
-			color: '#FF6600'
-		}
-		]
-	} else if (image === 'cody.jpg') {
-		return [
-		{
-			x: 0,
-			y: 0,
-			width: 50,
-			height: 10,
-			color: '#E5ECF4'
-		},
-		{
-			x: 0,
-			y: 10,
-			width: 50,
-			height: 10,
-			color: '#4C5EC8'
-		},
-		{
-			x: 0,
-			y: 20,
-			width: 50,
-			height: 10,
-			color: '#E5ECF4'
-		},
-		{
-			x: 0,
-			y: 30,
-			width: 50,
-			height: 10,
-			color: '#4C5EC8'
-		},
-		{
-			x: 0,
-			y: 40,
-			width: 50,
-			height: 10,
-			color: '#E5ECF4'
-		}
-		]
-	} else {
-		return [
-		{
-			x: 0,
-			y: 0,
-			width: 50,
-			height: 10,
-			color: '#FFE80E'
-		},
-		{
-			x: 0,
-			y: 10,
-			width: 50,
-			height: 10,
-			color: '#090901'
-		},
-		{
-			x: 0,
-			y: 20,
-			width: 50,
-			height: 10,
-			color: '#FFE80E'
-		},
-		{
-			x: 0,
-			y: 30,
-			width: 50,
-			height: 10,
-			color: '#090901'
-		},
-		{
-			x: 0,
-			y: 40,
-			width: 50,
-			height: 10,
-			color: '#FFE80E'
-		}
-		]
-	}
-}
-
-const initiateEvasionCountDown = function () {
-	if (!countDownStarted) {
-		let countDownValue = 125; // 125*40(intervals) = 5 seconds
-		let countDownText;
-		countDownStarted = true;
-
-		let countDownInterval =	setInterval(function () {
-			countDownText = Math.round(countDownValue * 40 / 1000);
-			if (countDownValue <= 0 || countDownForbidden) {
-				serverSocketIO.emit('EvasionCountDownBackFinished');
-				clearInterval(countDownInterval);
-				countDownForbidden = false;
-				countDownStarted = false;
-				if (countDownValue <= 0) {
-					instancesList.push({
-						player1Id: avatarSlot1.status,
-						player1Name: avatarSlot1.name,
-						player1Image: avatarSlot1.image,
-						player1Avatar: getCubeAvatar(avatarSlot1.image),
-						player1Score: 0,
-						player2Id: avatarSlot2.status,
-						player2Name: avatarSlot2.name,
-						player2Image: avatarSlot2.image,
-						player2Avatar: getCubeAvatar(avatarSlot2.image),
-						player2Score: 0,
-						level: 1,
-						active: true
-					});
-					instancesList[instancesList.length - 1].rules = instanceGenerator(instancesList.length - 1);
-					var destination = '/game/' + instancesList.length;
-					serverSocketIO.emit('redirectToGameInstance', {
-						url: destination,
-						player1: avatarSlot1.name,
-						player2: avatarSlot2.name
-					});
-					console.log('instance creation : ' + instancesList.length);
-				}
-			} else {
-				serverSocketIO.emit('updateEvasionCountDownBack', countDownText);
-				countDownValue--;
-			}
-		}, 40);
-	}
-}
-
-let emptySlot = function (socket) {
-	let leavingName;
-	for (var i = 0; i < playerList.length; i++) {
-		if (getHandshakeId(socket) === playerList[i].id) {
-			leavingName = playerList[i].name;
-		}
-	}
-	if (avatarSlot1.status === getHandshakeId(socket)) {
-		avatarSlot1.status = 'empty';
-		avatarSlot1.image = 'jail.jpg';
-		avatarSlot1.name = 'vide';
-		return {
-			slot: 1,
-			id: getHandshakeId(socket),
-			name: leavingName
-		}
-	} else if (avatarSlot2.status === getHandshakeId(socket)) {
-		avatarSlot2.status = 'empty';
-		avatarSlot2.image = 'jail.jpg';
-		avatarSlot2.name = 'vide';
-		return {
-			slot: 2,
-			id: getHandshakeId(socket),
-			name: leavingName
-		}
-	} else {
-		return {
-			id: getHandshakeId(socket)
-		}
-	}
-}
-
 const lobbyRegex = /\Wlobby$/i;
 
 serverSocketIO.on('connection', function (socket) {
 	if (lobbyRegex.test(socket.handshake.headers.referer)) {
-	    console.log('Serveur dit : Connecté au navigateur, bienvenu au lobby ' + getHandshakeId(socket));
+	    console.log('Serveur dit : Connecté au navigateur, bienvenu au lobby ' + cubekat.getHandshakeId(socket));
 
 		connectedNumber ++;
 
 		socket.on('giveUserName', function (name) {
 		    playerList.push({
-		    	id: getHandshakeId(socket),
+		    	id: cubekat.getHandshakeId(socket),
 		    	name: name
 		    });
 		    updateFrontPlayerList();
 		    socket.on('nameInFrontUpdated', function () {
-		    	updateAvatarslots(socket);
+		    	cubekat.updateAvatarslots(serverSocketIO, socket, avatarSlot1, avatarSlot2);
 		    	socket.emit('updateConnectedList', playerList);
-		    	updateAntichamberStatus();
+		    	cubekat.updateAntichamberStatus(serverSocketIO, avatarSlot1, avatarSlot2);
 			});
 		});
 		
@@ -403,10 +140,10 @@ serverSocketIO.on('connection', function (socket) {
 		
 		// Disconnection management
 		socket.on('disconnect', function () {
-			serverSocketIO.emit('userDisconnected', emptySlot (socket));
-			updateAntichamberStatus();
+			serverSocketIO.emit('userDisconnected', cubekat.emptySlot(socket, playerList, avatarSlot1, avatarSlot2));
+			cubekat.updateAntichamberStatus(serverSocketIO, avatarSlot1, avatarSlot2);
 		    for (var i = 0; i < playerList.length; i++) {
-	            if (getHandshakeId(socket) === playerList[i].id) {
+	            if (cubekat.getHandshakeId(socket) === playerList[i].id) {
 	            	playerList.splice(i, 1);
 	            	i = playerList.length;
 	            }
@@ -418,28 +155,28 @@ serverSocketIO.on('connection', function (socket) {
 		// Antichamber management
 		socket.on('antichamberChangeFront', function () {
 			// test if the player is already in a slot or not (to determine if the player want to join or leave a slot)
-			if (getHandshakeId(socket) === avatarSlot1.status || getHandshakeId(socket) === avatarSlot2.status) {
-				serverSocketIO.emit('userLeaveAntichamber', emptySlot (socket));
+			if (cubekat.getHandshakeId(socket) === avatarSlot1.status || cubekat.getHandshakeId(socket) === avatarSlot2.status) {
+				serverSocketIO.emit('userLeaveAntichamber', cubekat.emptySlot (socket, playerList, avatarSlot1, avatarSlot2));
 				socket.emit('updateAntichamberAdderText', 'Rejoindre la partie');
 
 			// The player wants to join a slot, so we test if there is a slot available or not
-			} else if (getHandshakeId(socket) !== avatarSlot1.status && getHandshakeId(socket) !== avatarSlot2.status && (avatarSlot1.status === 'empty' || avatarSlot2.status === 'empty')) {
+			} else if (cubekat.getHandshakeId(socket) !== avatarSlot1.status && cubekat.getHandshakeId(socket) !== avatarSlot2.status && (avatarSlot1.status === 'empty' || avatarSlot2.status === 'empty')) {
 				if (avatarSlot1.status === 'empty') {
-					avatarSlot1.status = getHandshakeId(socket);
+					avatarSlot1.status = cubekat.getHandshakeId(socket);
 					for (var i = 0; i < playerList.length; i++) {
-						if (getHandshakeId(socket) === playerList[i].id) {
+						if (cubekat.getHandshakeId(socket) === playerList[i].id) {
 							avatarSlot1.name = playerList[i].name;
 						}
 					}
-					avatarSlot1.image = getAvatarImage(avatarSlot1);
+					avatarSlot1.image = cubekat.getAvatarImage(avatarSlot1, avatarSlot2, avatarList);
 				} else {
-					avatarSlot2.status = getHandshakeId(socket);
+					avatarSlot2.status = cubekat.getHandshakeId(socket);
 					for (var i = 0; i < playerList.length; i++) {
-						if (getHandshakeId(socket) === playerList[i].id) {
+						if (cubekat.getHandshakeId(socket) === playerList[i].id) {
 							avatarSlot2.name = playerList[i].name;
 						}
 					}
-					avatarSlot2.image = getAvatarImage(avatarSlot2);
+					avatarSlot2.image = cubekat.getAvatarImage(avatarSlot2, avatarSlot1, avatarList);
 				}
 		    	serverSocketIO.emit('playerHasJoinedAntichamber', {
 		    		slot1: {
@@ -457,9 +194,9 @@ serverSocketIO.on('connection', function (socket) {
 		    	});
 		    	socket.emit('updateAntichamberAdderText', 'Quitter la partie');
 		    }
-		    updateAntichamberStatus();
+		    cubekat.updateAntichamberStatus(serverSocketIO, avatarSlot1, avatarSlot2);
 		    if (avatarSlot1.status !== 'empty' && avatarSlot2.status !== 'empty') {
-		    	initiateEvasionCountDown();
+		    	cubekat.initiateEvasionCountDown(serverSocketIO, countDownStarted, countDownForbidden, instancesList, avatarSlot1, avatarSlot2);
 		    } else {
 		    	if (countDownStarted) {
 					if (!countDownForbidden) {
@@ -478,8 +215,8 @@ serverSocketIO.on('connection', function (socket) {
 		});
 
 		socket.on('switchAvatarSlot1', function () {
-			if (getHandshakeId(socket) === avatarSlot1.status) {
-				avatarSlot1.image = getAvatarImage(avatarSlot1);
+			if (cubekat.getHandshakeId(socket) === avatarSlot1.status) {
+				avatarSlot1.image = cubekat.getAvatarImage(avatarSlot1, avatarSlot2, avatarList);
 				serverSocketIO.emit('switchAntichamberBack', {
 					slot: 'slot1',
 					image: avatarSlot1.image
@@ -490,8 +227,8 @@ serverSocketIO.on('connection', function (socket) {
 		});
 
 		socket.on('switchAvatarSlot2', function () {
-			if (getHandshakeId(socket) === avatarSlot2.status) {
-				avatarSlot2.image = getAvatarImage(avatarSlot2);
+			if (cubekat.getHandshakeId(socket) === avatarSlot2.status) {
+				avatarSlot2.image = cubekat.getAvatarImage(avatarSlot2, avatarSlot1, avatarList);
 				serverSocketIO.emit('switchAntichamberBack', {
 					slot: 'slot2',
 					image: avatarSlot2.image
@@ -500,34 +237,6 @@ serverSocketIO.on('connection', function (socket) {
 				console.log('Access forbidden to slot 2 !');
 			}
 		});
-
-		const getAvatarImage = function (slot) {
-			let otherSlot;
-			if (slot === avatarSlot1) {
-				otherSlot = avatarSlot2;
-			} else {
-				otherSlot = avatarSlot1;
-			}
-			if (slot.image === 'jail.jpg') {
-				if (otherSlot.image !== avatarList[0]) {
-					slot.image = avatarList[0];
-				} else {
-					slot.image = avatarList[1];
-				}
-			} else {
-				for (var i = 0; i < avatarList.length; i++) {
-					if (slot.image === avatarList[i]) {
-						if (otherSlot.image !== avatarList[(i + 1) % avatarList.length]) {
-							slot.image = avatarList[(i + 1) % avatarList.length];
-						} else {
-							slot.image = avatarList[(i + 2) % avatarList.length];
-						}
-						i = avatarList.length;
-					}
-				}
-			}
-			return slot.image
-		}
 	}
 });
 
@@ -539,343 +248,26 @@ serverSocketIO.on('connection', function (socket) {
 const gameRegex = /\Wgame\W\d+$/i;
 const instanceRegex = /\d+$/i;
 const instancesList = [];
-const mainLoop = function (instanceNumber) {
-	setInterval(function() {
-		let collisionHorizontaleDetectee = false;
-		let collisionVerticaleDetectee = false;
-		let player;
-		let walls = instancesList[instanceNumber].rules.walls;
-
-		for (var i = 0; i < 2; i++) {
-			let vecteurX = 0;
-			let vecteurY = 0;
-			if (i === 0) {
-				player = instancesList[instanceNumber].rules.player1;
-			} else {
-				player = instancesList[instanceNumber].rules.player2;
-			}
-
-			if (player.movingLeft) {
-				vecteurX = -8;
-			}
-			if (player.movingRight) {
-				vecteurX = 8;
-			}
-			if (player.movingUp) {
-				vecteurY = -8;
-			}
-			if (player.movingDown) {
-				vecteurY = 8;
-			}
-
-			// canvas border collisions tests
-			// horizontal test
-			if (player.x + vecteurX > 0 && player.x + player.width + vecteurX < instancesList[instanceNumber].rules.levelDimension.width) {
-				collisionHorizontaleDetectee = false;
-			} else {
-				collisionHorizontaleDetectee = true;
-			}
-			// vertical test
-			if (player.y + vecteurY > 0 && player.y + player.height + vecteurY < instancesList[instanceNumber].rules.levelDimension.height) {
-				collisionVerticaleDetectee = false;
-			} else {
-				collisionVerticaleDetectee = true;
-			}
-
-			// test set up collisions
-			for (var j = 0; j < walls.length; j++) {
-				// compraisons between hitbox player and every hitbos set up
-				if (
-					player.y + player.height + vecteurY > walls[j].y
-					&& player.y + vecteurY < walls[j].y + walls[j].height
-					&& player.x + player.width + vecteurX > walls[j].x
-					&& player.x + vecteurX < walls[j].x + walls[j].width
-					) {
-					
-					// If horizontal collision detected, block horizontal moves
-					if (player.y + player.height > walls[j].y && player.y < walls[j].y + walls[j].height) {
-						collisionHorizontaleDetectee = true;
-						// Firewall collisions management
-						if (walls[j].isFire) {
-							console.log('T\'ES MORT !');
-						}
-						// victory management
-						if (walls[j].key) {
-							console.log('victoire !')
-						}
-					}
-					//If vertical collision detected, block vertical moves
-					if (player.x + player.width > walls[j].x && player.x < walls[j].x + walls[j].width) {
-						collisionVerticaleDetectee = true;
-						// Firewall collisions management
-						if (walls[j].isFire) {
-							console.log('T\'ES MORT !');
-						}
-						// victory management
-						if (walls[j].key) {
-							console.log('victoire !')
-						}
-					}
-					// If no collision detected so the player is making a diagonal move
-					if (!collisionHorizontaleDetectee && !collisionVerticaleDetectee) {
-						collisionHorizontaleDetectee = true;
-						collisionVerticaleDetectee = true;
-						// Firewall collisions management
-						if (walls[j].isFire) {
-							document.location.reload(true);
-						}
-						// victory management
-						if (walls[j].key) {
-							console.log('victoire !')
-						}
-					}
-				}
-			}
-
-			// player1 moves
-			if (!collisionHorizontaleDetectee) {
-				player.x += vecteurX;
-			}
-			if (!collisionVerticaleDetectee) {
-				player.y += vecteurY;
-			}
-		}
-
-		// Fire walls moves
-		instancesList[instanceNumber].rules.instanceCounter += 0.05;
-		for (var i = 0; i < walls.length; i++) {
-			if (walls[i].isFire) {
-				walls[i].x += Math.sin(instancesList[instanceNumber].rules.instanceCounter) * 4
-			}
-		}
-
-		serverSocketIO.emit('updateFrontElements', {
-			level: instancesList[instanceNumber].level,
-			player1: instancesList[instanceNumber].rules.player1,
-			player1Name: instancesList[instanceNumber].player1Name,
-			player1Avatar: instancesList[instanceNumber].player1Avatar,
-			player2: instancesList[instanceNumber].rules.player2,
-			player2Name: instancesList[instanceNumber].player2Name,
-			player2Avatar: instancesList[instanceNumber].player2Avatar,
-			instanceCounter: instancesList[instanceNumber].rules.instanceCounter,
-			finishZone: instancesList[instanceNumber].rules.finishZone,
-			walls: walls
-		});
-	}, 40);
-};
-const updatePlayerMoves = function (socket, moves) {
-	let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
-	let player;
-	if (getHandshakeId(socket) === instancesList[instanceRequired - 1].player1Id) {
-		player = instancesList[instanceRequired - 1].rules.player1;
-	} else if (getHandshakeId(socket) === instancesList[instanceRequired - 1].player2Id) {
-		player = instancesList[instanceRequired - 1].rules.player2;
-	} else {
-		return false
-	}
-	if (player) {
-		if (moves.movingUp === true || moves.movingUp === false) {
-			player.movingUp = moves.movingUp;
-		}
-		if (moves.movingDown === true || moves.movingDown === false) {
-			player.movingDown = moves.movingDown;
-		}
-		if (moves.movingLeft === true || moves.movingLeft === false) {
-			player.movingLeft = moves.movingLeft;
-		}
-		if (moves.movingRight === true || moves.movingRight === false) {
-			player.movingRight = moves.movingRight;
-		}
-	}
-}
-
-const instanceGenerator = function (instanceId) {
-	let rules = 'ERROR RULES NOT CORRECTLY GENERATED !';
-	if (instancesList[instanceId].level === 1) {
-		rules = {
-			levelStarted: false,
-			levelDimension: {
-				width: 800,
-				height: 600
-			},
-			finishZone: {
-				x: 350,
-				y: 500
-			},
-			player1: {
-				x: 50,
-				y: 50,
-				width: 50,
-				height: 50,
-				movingLeft: false,
-				movingRight: false,
-				movingUp: false,
-				movingDown: false,
-			},
-			player2: {
-				x: 700,
-				y: 50,
-				width: 50,
-				height: 50,
-				movingLeft: false,
-				movingRight: false,
-				movingUp: false,
-				movingDown: false,
-			},
-			walls: [
-				{
-					x: 350,
-					y: 0,
-					width: 100,
-					height: 400,
-					color: "black",
-					isFire: false,
-				},
-				{
-					x: 0,
-					y: 250,
-					width: 250,
-					height: 50,
-					color: "black",
-					isFire: false,
-				},
-				{
-					x: 550,
-					y: 250,
-					width: 250,
-					height: 50,
-					color: "black",
-					isFire: false,
-				},
-				{
-					x: 0,
-					y: 300,
-					width: 50,
-					height: 100,
-					color: "black",
-					isFire: false,
-				},
-				{
-					x: 100,
-					y: 300,
-					width: 50,
-					height: 100,
-					color: "black",
-					isFire: false,
-				},
-				{
-					x: 200,
-					y: 300,
-					width: 50,
-					height: 100,
-					color: "black",
-					isFire: false,
-				},
-				{
-					x: 550,
-					y: 300,
-					width: 50,
-					height: 100,
-					isFire: false,
-				},
-				{
-					x: 650,
-					y: 300,
-					width: 50,
-					height: 100,
-					color: "black",
-					isFire: false,
-				},
-				{
-					x: 750,
-					y: 300,
-					width: 50,
-					height: 100,
-					color: "black",
-					isFire: false,
-				},
-				{
-					x: 250,
-					y: 250,
-					width: 50,
-					height: 50,
-					color: "blue",
-					isFire: false,
-					isDoor : {
-						horizMaxPot: 75,
-						xGauge: 75,
-						vertMaxPot: 0,
-						yGauge: 0
-					}
-				},
-				{
-					x: 300,
-					y: 250,
-					width: 50,
-					height: 150,
-					color: "blue",
-					isFire: false,
-					isDoor : {
-						horizMaxPot: 75,
-						xGauge: 75,
-						vertMaxPot: 0,
-						yGauge: 0
-					}
-				},
-				{
-					x: 450,
-					y: 250,
-					width: 50,
-					height: 150,
-					color: "blue",
-					isFire: false,
-					isDoor : {
-						horizMaxPot: 75,
-						xGauge: 75,
-						vertMaxPot: 0,
-						yGauge: 0
-					}
-				},
-				{
-					x: 500,
-					y: 250,
-					width: 50,
-					height: 50,
-					color: "blue",
-					isFire: false,
-					isDoor : {
-						horizMaxPot: 75,
-						xGauge: 75,
-						vertMaxPot: 0,
-						yGauge: 0
-					}
-				}
-			],
-			instanceCounter: 0
-		};
-	}
-	return rules;
-}
 
 serverSocketIO.on('connection', function (socket) {
 	if (gameRegex.test(socket.handshake.headers.referer)) {
 		let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
 		if (instancesList[instanceRequired - 1] && instancesList[instanceRequired - 1].active) {
-			console.log('Serveur dit : Connecté au navigateur, dans la partie '+ instanceRequired + ', demande faite par ' + getHandshakeId(socket));
+			console.log('Serveur dit : Connecté au navigateur, dans la partie '+ instanceRequired + ', demande faite par ' + cubekat.getHandshakeId(socket));
 			if (true && !instancesList[instanceRequired - 1].rules.levelStarted) {
 				instancesList[instanceRequired - 1].rules.levelStarted = true;
-				mainLoop(instanceRequired - 1);
+				cubekat.mainLoop(serverSocketIO, instanceRequired - 1, instancesList);
 				console.log('level ' + instanceRequired + ' started');
 				socket.on('updatePlayerList', function (moves) {
-					playerList[instanceRequired - 1].rules.updatePlayerMoves(socket, moves);
+					playerList[instanceRequired - 1].rules.updatePlayerMoves(socket, instancesList, moves, instanceRegex);
 				});
 			}
 			// Here we collect players inputs
 			socket.on('playerMove', function (moves) {
-				updatePlayerMoves(socket, moves);
+				cubekat.updatePlayerMoves(socket, instancesList, moves, instanceRegex);
 			});
 		} else {
-			console.log('Serveur dit : l\'accès à l\'instance ' + instanceRequired + ' est refusé, demande faite par ' + getHandshakeId(socket));
+			console.log('Serveur dit : l\'accès à l\'instance ' + instanceRequired + ' est refusé, demande faite par ' + cubekat.getHandshakeId(socket));
 			socket.emit('redirectToLobby');
 		}
 	}
