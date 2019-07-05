@@ -27,10 +27,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded()); // to support URL-encoded bodies
-app.use("/images", express.static(__dirname + '/images'));
-app.use("/css", express.static(__dirname + '/css'));
-app.use("/js", express.static(__dirname + '/js'));
-app.use("/", require("./routing"));
+app.use('/images', express.static(__dirname + '/images'));
+app.use('/css', express.static(__dirname + '/css'));
+app.use('/js', express.static(__dirname + '/js'));
+app.use('/', require('./routing'));
 
 app.set('view engine', 'pug');
 app.set('views','./views');
@@ -265,6 +265,10 @@ serverSocketIO.on('connection', function (socket) {
 			// Here we collect players inputs
 			socket.on('playerMove', function (moves) {
 				cubekat.updatePlayerMoves(socket, instancesList, moves, instanceRegex);
+			});
+
+			socket.on('nextLevel', function (moves) {
+				
 			});
 		} else {
 			console.log('Serveur dit : l\'accès à l\'instance ' + instanceRequired + ' est refusé, demande faite par ' + cubekat.getHandshakeId(socket));

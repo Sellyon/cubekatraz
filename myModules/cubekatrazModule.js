@@ -1,4 +1,5 @@
 const cookieParser = require('cookie-parser');
+const level1 = require(__dirname + '/level1.js');
 
 exports.getHandshakeId = function (socket) {
   const cookieRegex = /connect.sid\=([^;]+)/g;
@@ -170,7 +171,7 @@ exports.initiateEvasionCountDown = function (serverSocketIO, countDownStarted, c
             level: 1,
             active: true
           });
-          instancesList[instancesList.length - 1].rules = exports.instanceGenerator(instancesList.length - 1, instancesList);
+          instancesList[instancesList.length - 1].rules = instanceGenerator(instancesList.length - 1, instancesList);
           var destination = '/game/' + instancesList.length;
           serverSocketIO.emit('redirectToGameInstance', {
             url: destination,
@@ -219,12 +220,43 @@ exports.emptySlot = function (socket, playerList, avatarSlot1, avatarSlot2) {
   }
 }
 
+var testCollisions = function (obj1, obj2, vecteurX, vecteurY) {
+  var collisionDetected = false;
+  var horizontalCollision = false;
+  var verticalCollision = false;
+
+  // compraisons between hitbox player and other hitbox
+  if (
+    obj1.y + obj1.height + vecteurY > obj2.y
+  && obj1.y + vecteurY < obj2.y + obj2.height
+  && obj1.x + obj1.width + vecteurX > obj2.x
+  && obj1.x + vecteurX < obj2.x + obj2.width
+  ) {
+  
+    // If horizontal collision detected, block horizontal moves
+    if (obj1.y + obj1.height > obj2.y && obj1.y < obj2.y + obj2.height) {
+      collisionDetected = true;
+      horizontalCollision = true;
+    }
+    //If vertical collision detected, block vertical moves
+    if (obj1.x + obj1.width > obj2.x && obj1.x < obj2.x + obj2.width) {
+      collisionDetected = true;
+      verticalCollision = true;
+    }
+  }
+  return {collisionDetected, horizontalCollision, verticalCollision}
+}
+
 exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
   setInterval(function() {
     let collisionHorizontaleDetectee = false;
     let collisionVerticaleDetectee = false;
     let player;
     let walls = instancesList[instanceNumber].rules.walls;
+    let switches;
+    if (instancesList[instanceNumber].rules.switches) {
+      switches = instancesList[instanceNumber].rules.switches;
+    }
 
     for (var i = 0; i < 2; i++) {
       let vecteurX = 0;
@@ -264,54 +296,47 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
 
       // test set up collisions
       for (var j = 0; j < walls.length; j++) {
-        // compraisons between hitbox player and every hitbos set up
-        if (
-          player.y + player.height + vecteurY > walls[j].y
-          && player.y + vecteurY < walls[j].y + walls[j].height
-          && player.x + player.width + vecteurX > walls[j].x
-          && player.x + vecteurX < walls[j].x + walls[j].width
-          ) {
+        // test a collision
+        var getCollisions = testCollisions(player, walls[j], vecteurX, vecteurY);
+
+        // Horizontal collision detected
+        if (getCollisions.horizontalCollision) {
+          collisionHorizontaleDetectee = getCollisions.horizontalCollision;
+        }
+
+        // Vertical collision detected
+        if (getCollisions.verticalCollision) {
+          collisionVerticaleDetectee = getCollisions.verticalCollision;
+        }
+
+        // Diagonal collision detected
+        if (getCollisions.collisionDetected && !getCollisions.verticalCollision && !getCollisions.horizontalCollision) {
+          collisionHorizontaleDetectee = true;
+          collisionVerticaleDetectee = true;
+        }
+        // resolve specific collisions
+        if (getCollisions.collisionDetected) {
+        }
+      }
+
+      // test switches
+      if (switches) {
+        for (var k = 0; k < switches.length; k++) {
+          // test a collision
+          var getCollisions = testCollisions(player, switches[k], vecteurX, vecteurY);
           
-          // If horizontal collision detected, block horizontal moves
-          if (player.y + player.height > walls[j].y && player.y < walls[j].y + walls[j].height) {
-            collisionHorizontaleDetectee = true;
-            // Firewall collisions management
-            if (walls[j].isFire) {
-              console.log('T\'ES MORT !');
-            }
-            // victory management
-            if (walls[j].key) {
-              console.log('victoire !')
-            }
-          }
-          //If vertical collision detected, block vertical moves
-          if (player.x + player.width > walls[j].x && player.x < walls[j].x + walls[j].width) {
-            collisionVerticaleDetectee = true;
-            // Firewall collisions management
-            if (walls[j].isFire) {
-              console.log('T\'ES MORT !');
-            }
-            // victory management
-            if (walls[j].key) {
-              console.log('victoire !')
-            }
-          }
-          // If no collision detected so the player is making a diagonal move
-          if (!collisionHorizontaleDetectee && !collisionVerticaleDetectee) {
-            collisionHorizontaleDetectee = true;
-            collisionVerticaleDetectee = true;
-            // Firewall collisions management
-            if (walls[j].isFire) {
-              document.location.reload(true);
-            }
-            // victory management
-            if (walls[j].key) {
-              console.log('victoire !')
+          // resolve specific collisions
+          if (getCollisions.collisionDetected && !switches[k].activated) {
+            for (let l = 0; l < walls.length; l++) {
+              if (walls[l].isDoor && switches[k].id === walls[l].isDoor.id && !walls[l].isDoor.activated) {
+                walls[l].isDoor.activated = true;
+                switches[k].activated = true;
+              }
             }
           }
         }
       }
-
+  
       // player1 moves
       if (!collisionHorizontaleDetectee) {
         player.x += vecteurX;
@@ -320,8 +345,33 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
         player.y += vecteurY;
       }
     }
+    
+    // Activated doors moves
+    for (var i = 0; i < walls.length; i++) {
+      if (walls[i].isDoor && walls[i].isDoor.activated) {
+        if (walls[i].isDoor.xGauge === 0 && walls[i].isDoor.yGauge === 0) {
+          walls[i].isDoor.activated = false;
+        }
+        if (walls[i].isDoor.horizMaxPot !== 0 && walls[i].isDoor.horizMaxPot > 0) {
+          walls[i].isDoor.xGauge --;
+          walls[i].x --;
+        };
+        if (walls[i].isDoor.horizMaxPot !== 0 && walls[i].isDoor.horizMaxPot < 0) {
+          walls[i].isDoor.xGauge ++;
+          walls[i].x ++;
+        };
+        if (walls[i].isDoor.vertMaxPot !== 0 && walls[i].isDoor.vertMaxPot > 0) {
+          walls[i].isDoor.yGauge --;
+          walls[i].y --;
+        };
+        if (walls[i].isDoor.vertMaxPot !== 0 && walls[i].isDoor.vertMaxPot < 0) {
+          walls[i].isDoor.yGauge ++;
+          walls[i].y ++;
+        };
+      }
+    }
 
-    // Fire walls moves
+    //Fire walls moves
     instancesList[instanceNumber].rules.instanceCounter += 0.05;
     for (var i = 0; i < walls.length; i++) {
       if (walls[i].isFire) {
@@ -359,173 +409,12 @@ exports.updatePlayerMoves = function (socket, instancesList, moves, instanceRege
   }
 }
 
-exports.instanceGenerator = function (instanceId, instancesList) {
+instanceGenerator = function (instanceId, instancesList) {
   let rules = 'ERROR RULES NOT CORRECTLY GENERATED !';
   if (instancesList[instanceId].level === 1) {
-    rules = {
-      levelStarted: false,
-      levelDimension: {
-        width: 800,
-        height: 600
-      },
-      finishZone: {
-        x: 350,
-        y: 500
-      },
-      player1: {
-        x: 50,
-        y: 50,
-        width: 50,
-        height: 50,
-        movingLeft: false,
-        movingRight: false,
-        movingUp: false,
-        movingDown: false,
-      },
-      player2: {
-        x: 700,
-        y: 50,
-        width: 50,
-        height: 50,
-        movingLeft: false,
-        movingRight: false,
-        movingUp: false,
-        movingDown: false,
-      },
-      walls: [
-        {
-          x: 350,
-          y: 0,
-          width: 100,
-          height: 400,
-          color: "black",
-        },
-        {
-          x: 0,
-          y: 250,
-          width: 250,
-          height: 50,
-          color: "black",
-        },
-        {
-          x: 550,
-          y: 250,
-          width: 250,
-          height: 50,
-          color: "black",
-        },
-        {
-          x: 0,
-          y: 300,
-          width: 50,
-          height: 100,
-          color: "black",
-        },
-        {
-          x: 100,
-          y: 300,
-          width: 50,
-          height: 100,
-          color: "black",
-        },
-        {
-          x: 200,
-          y: 300,
-          width: 50,
-          height: 100,
-          color: "black",
-        },
-        {
-          x: 550,
-          y: 300,
-          width: 50,
-          height: 100,
-        },
-        {
-          x: 650,
-          y: 300,
-          width: 50,
-          height: 100,
-          color: "black",
-        },
-        {
-          x: 750,
-          y: 300,
-          width: 50,
-          height: 100,
-          color: "black",
-        },
-        {
-          x: 250,
-          y: 250,
-          width: 50,
-          height: 50,
-          color: "blue",
-          isDoor : {
-            horizMaxPot: 75,
-            xGauge: 75,
-            vertMaxPot: 0,
-            yGauge: 0
-          }
-        },
-        {
-          x: 300,
-          y: 250,
-          width: 50,
-          height: 150,
-          color: "blue",
-          isDoor : {
-            horizMaxPot: 75,
-            xGauge: 75,
-            vertMaxPot: 0,
-            yGauge: 0
-          }
-        },
-        {
-          x: 450,
-          y: 250,
-          width: 50,
-          height: 150,
-          color: "green",
-          isDoor : {
-            horizMaxPot: 75,
-            xGauge: 75,
-            vertMaxPot: 0,
-            yGauge: 0
-          }
-        },
-        {
-          x: 500,
-          y: 250,
-          width: 50,
-          height: 50,
-          color: "green",
-          isDoor : {
-            horizMaxPot: 75,
-            xGauge: 75,
-            vertMaxPot: 0,
-            yGauge: 0
-          }
-        }
-      ],
-      switches : [
-        {
-          x: 300,
-          y: 150,
-          width: 50,
-          height: 50,
-          color : 'green'
-        },
-        {
-          x: 100,
-          y: 500,
-          width: 50,
-          height: 50,
-          color : 'blue'
-        }
-      ],
-      instanceCounter: 0
-    };
+    rules = level1.rules;
+  } else if (instancesList[instanceId].level === 2) {
+    rules = level1.rules;
   }
   return rules;
 }

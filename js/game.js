@@ -126,14 +126,24 @@ window.document.addEventListener('DOMContentLoaded', function () {
 
 			// draw walls
 			for (var i = 0; i < walls.length; i++) {
-				context.fillStyle = walls[i].color;
+				if (walls[i].isDoor && walls[i].isDoor.isActivated) {
+					context.fillStyle = '#86949C';
+				} else {
+					context.fillStyle = walls[i].color;
+				}
 				context.fillRect(walls[i].x, walls[i].y, walls[i].width, walls[i].height);
 			}
 
 			// draw switches
+			var opacitySwitches = ((Math.sin(instanceCounter / 1) + 2) / 2) / 2;
 			for (var i = 0; i < switches.length; i++) {
-				context.fillStyle = switches[i].color;
-				context.fillRect(switches[i].x, switches[i].y, switches[i].width, switches[i].height);
+				if (!switches[i].activated) {
+					context.fillStyle = 'rgba('+ switches[i].color[0] + ',' + switches[i].color[1] + ',' + switches[i].color[2] + ',' + opacitySwitches + ')';
+					context.fillRect(switches[i].x, switches[i].y, switches[i].width, switches[i].height);
+				}
+				context.strokeStyle = "#86949C";
+				context.lineWidth = '1';
+				context.strokeRect(switches[i].x + 2, switches[i].y + 2, switches[i].width - 4, switches[i].height - 4);
 			}
 
 			// draw finish zone
