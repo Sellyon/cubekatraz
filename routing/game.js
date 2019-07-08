@@ -1,9 +1,10 @@
+const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const MongoClient = require('mongodb').MongoClient;
 const objectId = require('mongodb').ObjectID;
-const client = require(__dirname + '/routerModules/db.js');
+const client = require(path.join(__dirname, '/../dbs/db.js'));
 const routMod = require(__dirname + '/routerModules/routerModule.js');
 const uri = "mongodb+srv://yoannmroz:Ech1ariandre@cluster0-bznsv.mongodb.net/test?retryWrites=true&w=majority";
 const secret = '123456789SECRET';

@@ -233,3 +233,20 @@ nav div ul li a {
 	text-align: left;
     list-style: none;
 }
+
+#levelTitle {
+	margin-top: 8px;
+	margin-bottom: 2px;
+}
+
+#infosInGame {
+	width: 30%;
+	display: inline-block;
+}
+
+#victoryButton {
+	position: relative;
+	visibility: hidden;
+	left: -500px;
+	top: -300px;
+}

@@ -31,8 +31,8 @@ exports.convertDateNowToEuropeanDate = function (date) {
 }
 
 exports.msToTime = function(duration) {
-    let milliseconds = parseInt((duration%1000)/100)
-        , seconds = parseInt((duration/1000)%60)
+    // let milliseconds = parseInt((duration%1000)/100)
+    let seconds = parseInt((duration/1000)%60)
         , minutes = parseInt((duration/(1000*60))%60)
         , hours = parseInt((duration/(1000*60*60))%24);
 
@@ -40,5 +40,5 @@ exports.msToTime = function(duration) {
     minutes = (minutes < 10) ? "0" + minutes : minutes;
     seconds = (seconds < 10) ? "0" + seconds : seconds;
 
-    return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
+    return hours + ":" + minutes + ":" + seconds;
 }

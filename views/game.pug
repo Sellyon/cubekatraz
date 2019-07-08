@@ -1,10 +1,20 @@
 html
-  include includes/head.pug
-  head
-    link(rel='stylesheet', type='text/css', href='/css/game.css')
-  script(src='/socket.io/socket.io.js')
-  body
-    h1#levelTitle
-      | Level 1
-    script(type='text/javascript', src='/js/game.js')
-    canvas#canvas Votre navigateur ne supporte pas HTML5, veuillez le mettre &agrave; jour pour jouer.
+	include includes/head.pug
+	head
+		link(rel='stylesheet', type='text/css', href='/css/game.css')
+		script(src='/socket.io/socket.io.js')
+	body
+		h1#levelTitle
+			| Level 1
+		script(type='text/javascript', src='/js/game.js')
+		div#infosInGame
+			h2#player1NameInGame
+			span#player1ScoreInGame
+			h2#player2NameInGame
+			span#player2ScoreInGame
+			h2
+				| Temps écoulé : 
+			span#elapsedTimeInGame
+		div#canvasAndButton
+			canvas#canvas Votre navigateur ne supporte pas HTML5, veuillez le mettre &agrave; jour pour jouer.
+			button#victoryButton(name='button') HOURRA !

@@ -15,9 +15,9 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const MongoClient = require('mongodb').MongoClient;
 const objectId = require('mongodb').ObjectID;
 const client = require(__dirname + '/dbs/db.js');
-const cubekat = require(__dirname + '/myModules/cubekatrazModule.js');
+const lobbyMod = require(__dirname + '/myModules/lobbyModule.js');
+const gameMod = require(__dirname + '/myModules/gameModule.js');
 const uri = "mongodb+srv://yoannmroz:Ech1ariandre@cluster0-bznsv.mongodb.net/test?retryWrites=true&w=majority";
-
 var myDB;
 
 app.locals.basedir = path.join(__dirname, '/views/includes');
@@ -84,20 +84,20 @@ const lobbyRegex = /\Wlobby$/i;
 
 serverSocketIO.on('connection', function (socket) {
 	if (lobbyRegex.test(socket.handshake.headers.referer)) {
-	    console.log('Serveur dit : Connecté au navigateur, bienvenu au lobby ' + cubekat.getHandshakeId(socket));
+	    console.log('Serveur dit : Connecté au navigateur, bienvenu au lobby ' + lobbyMod.getHandshakeId(socket));
 
 		connectedNumber ++;
 
 		socket.on('giveUserName', function (name) {
 		    playerList.push({
-		    	id: cubekat.getHandshakeId(socket),
+		    	id: lobbyMod.getHandshakeId(socket),
 		    	name: name
 		    });
 		    updateFrontPlayerList();
 		    socket.on('nameInFrontUpdated', function () {
-		    	cubekat.updateAvatarslots(serverSocketIO, socket, avatarSlot1, avatarSlot2);
+		    	lobbyMod.updateAvatarslots(serverSocketIO, socket, avatarSlot1, avatarSlot2);
 		    	socket.emit('updateConnectedList', playerList);
-		    	cubekat.updateAntichamberStatus(serverSocketIO, avatarSlot1, avatarSlot2);
+		    	lobbyMod.updateAntichamberStatus(serverSocketIO, avatarSlot1, avatarSlot2);
 			});
 		});
 		
@@ -140,10 +140,10 @@ serverSocketIO.on('connection', function (socket) {
 		
 		// Disconnection management
 		socket.on('disconnect', function () {
-			serverSocketIO.emit('userDisconnected', cubekat.emptySlot(socket, playerList, avatarSlot1, avatarSlot2));
-			cubekat.updateAntichamberStatus(serverSocketIO, avatarSlot1, avatarSlot2);
+			serverSocketIO.emit('userDisconnected', lobbyMod.emptySlot(socket, playerList, avatarSlot1, avatarSlot2));
+			lobbyMod.updateAntichamberStatus(serverSocketIO, avatarSlot1, avatarSlot2);
 		    for (var i = 0; i < playerList.length; i++) {
-	            if (cubekat.getHandshakeId(socket) === playerList[i].id) {
+	            if (lobbyMod.getHandshakeId(socket) === playerList[i].id) {
 	            	playerList.splice(i, 1);
 	            	i = playerList.length;
 	            }
@@ -155,28 +155,28 @@ serverSocketIO.on('connection', function (socket) {
 		// Antichamber management
 		socket.on('antichamberChangeFront', function () {
 			// test if the player is already in a slot or not (to determine if the player want to join or leave a slot)
-			if (cubekat.getHandshakeId(socket) === avatarSlot1.status || cubekat.getHandshakeId(socket) === avatarSlot2.status) {
-				serverSocketIO.emit('userLeaveAntichamber', cubekat.emptySlot (socket, playerList, avatarSlot1, avatarSlot2));
+			if (lobbyMod.getHandshakeId(socket) === avatarSlot1.status || lobbyMod.getHandshakeId(socket) === avatarSlot2.status) {
+				serverSocketIO.emit('userLeaveAntichamber', lobbyMod.emptySlot (socket, playerList, avatarSlot1, avatarSlot2));
 				socket.emit('updateAntichamberAdderText', 'Rejoindre la partie');
 
 			// The player wants to join a slot, so we test if there is a slot available or not
-			} else if (cubekat.getHandshakeId(socket) !== avatarSlot1.status && cubekat.getHandshakeId(socket) !== avatarSlot2.status && (avatarSlot1.status === 'empty' || avatarSlot2.status === 'empty')) {
+			} else if (lobbyMod.getHandshakeId(socket) !== avatarSlot1.status && lobbyMod.getHandshakeId(socket) !== avatarSlot2.status && (avatarSlot1.status === 'empty' || avatarSlot2.status === 'empty')) {
 				if (avatarSlot1.status === 'empty') {
-					avatarSlot1.status = cubekat.getHandshakeId(socket);
+					avatarSlot1.status = lobbyMod.getHandshakeId(socket);
 					for (var i = 0; i < playerList.length; i++) {
-						if (cubekat.getHandshakeId(socket) === playerList[i].id) {
+						if (lobbyMod.getHandshakeId(socket) === playerList[i].id) {
 							avatarSlot1.name = playerList[i].name;
 						}
 					}
-					avatarSlot1.image = cubekat.getAvatarImage(avatarSlot1, avatarSlot2, avatarList);
+					avatarSlot1.image = lobbyMod.getAvatarImage(avatarSlot1, avatarSlot2, avatarList);
 				} else {
-					avatarSlot2.status = cubekat.getHandshakeId(socket);
+					avatarSlot2.status = lobbyMod.getHandshakeId(socket);
 					for (var i = 0; i < playerList.length; i++) {
-						if (cubekat.getHandshakeId(socket) === playerList[i].id) {
+						if (lobbyMod.getHandshakeId(socket) === playerList[i].id) {
 							avatarSlot2.name = playerList[i].name;
 						}
 					}
-					avatarSlot2.image = cubekat.getAvatarImage(avatarSlot2, avatarSlot1, avatarList);
+					avatarSlot2.image = lobbyMod.getAvatarImage(avatarSlot2, avatarSlot1, avatarList);
 				}
 		    	serverSocketIO.emit('playerHasJoinedAntichamber', {
 		    		slot1: {
@@ -194,9 +194,9 @@ serverSocketIO.on('connection', function (socket) {
 		    	});
 		    	socket.emit('updateAntichamberAdderText', 'Quitter la partie');
 		    }
-		    cubekat.updateAntichamberStatus(serverSocketIO, avatarSlot1, avatarSlot2);
+		    lobbyMod.updateAntichamberStatus(serverSocketIO, avatarSlot1, avatarSlot2);
 		    if (avatarSlot1.status !== 'empty' && avatarSlot2.status !== 'empty') {
-		    	cubekat.initiateEvasionCountDown(serverSocketIO, countDownStarted, countDownForbidden, instancesList, avatarSlot1, avatarSlot2);
+		    	lobbyMod.initiateEvasionCountDown(serverSocketIO, countDownStarted, countDownForbidden, instancesList, avatarSlot1, avatarSlot2);
 		    } else {
 		    	if (countDownStarted) {
 					if (!countDownForbidden) {
@@ -215,8 +215,8 @@ serverSocketIO.on('connection', function (socket) {
 		});
 
 		socket.on('switchAvatarSlot1', function () {
-			if (cubekat.getHandshakeId(socket) === avatarSlot1.status) {
-				avatarSlot1.image = cubekat.getAvatarImage(avatarSlot1, avatarSlot2, avatarList);
+			if (lobbyMod.getHandshakeId(socket) === avatarSlot1.status) {
+				avatarSlot1.image = lobbyMod.getAvatarImage(avatarSlot1, avatarSlot2, avatarList);
 				serverSocketIO.emit('switchAntichamberBack', {
 					slot: 'slot1',
 					image: avatarSlot1.image
@@ -227,8 +227,8 @@ serverSocketIO.on('connection', function (socket) {
 		});
 
 		socket.on('switchAvatarSlot2', function () {
-			if (cubekat.getHandshakeId(socket) === avatarSlot2.status) {
-				avatarSlot2.image = cubekat.getAvatarImage(avatarSlot2, avatarSlot1, avatarList);
+			if (lobbyMod.getHandshakeId(socket) === avatarSlot2.status) {
+				avatarSlot2.image = lobbyMod.getAvatarImage(avatarSlot2, avatarSlot1, avatarList);
 				serverSocketIO.emit('switchAntichamberBack', {
 					slot: 'slot2',
 					image: avatarSlot2.image
@@ -253,10 +253,10 @@ serverSocketIO.on('connection', function (socket) {
 	if (gameRegex.test(socket.handshake.headers.referer)) {
 		let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
 		if (instancesList[instanceRequired - 1] && instancesList[instanceRequired - 1].active) {
-			console.log('Serveur dit : Connecté au navigateur, dans la partie '+ instanceRequired + ', demande faite par ' + cubekat.getHandshakeId(socket));
+			console.log('Serveur dit : Connecté au navigateur, dans la partie '+ instanceRequired + ', demande faite par ' + lobbyMod.getHandshakeId(socket));
 			if (true && !instancesList[instanceRequired - 1].rules.levelStarted) {
 				instancesList[instanceRequired - 1].rules.levelStarted = true;
-				cubekat.mainLoop(serverSocketIO, instanceRequired - 1, instancesList);
+				gameMod.mainLoop(serverSocketIO, instanceRequired - 1, instancesList);
 				console.log('level ' + instanceRequired + ' started');
 				socket.on('updatePlayerList', function (moves) {
 					playerList[instanceRequired - 1].rules.updatePlayerMoves(socket, instancesList, moves, instanceRegex);
@@ -264,14 +264,10 @@ serverSocketIO.on('connection', function (socket) {
 			}
 			// Here we collect players inputs
 			socket.on('playerMove', function (moves) {
-				cubekat.updatePlayerMoves(socket, instancesList, moves, instanceRegex);
-			});
-
-			socket.on('nextLevel', function (moves) {
-				
+				gameMod.updatePlayerMoves(socket, instancesList, moves, instanceRegex);
 			});
 		} else {
-			console.log('Serveur dit : l\'accès à l\'instance ' + instanceRequired + ' est refusé, demande faite par ' + cubekat.getHandshakeId(socket));
+			console.log('Serveur dit : l\'accès à l\'instance ' + instanceRequired + ' est refusé, demande faite par ' + lobbyMod.getHandshakeId(socket));
 			socket.emit('redirectToLobby');
 		}
 	}

@@ -6,7 +6,11 @@ exports.rules = {
   },
   finishZone: {
     x: 350,
-    y: 500
+    y: 500,
+    width: 100,
+    height: 100,
+    player1InZone: false,
+    player2InZone: false
   },
   player1: {
     x: 50,
@@ -173,5 +177,33 @@ exports.rules = {
       activated: false
     }
   ],
-  instanceCounter: 0
+  coins : [
+  {
+    x: 62,
+    y: 325,
+    width: 25,
+    height: 25
+  },
+  {
+    x: 162,
+    y: 325,
+    width: 25,
+    height: 25
+  },
+  {
+    x: 612,
+    y: 325,
+    width: 25,
+    height: 25
+  },
+  {
+    x: 712,
+    y: 325,
+    width: 25,
+    height: 25
+  }
+  ],
+  instanceCounter: 0,
+  levelColor: '#D9D1D7',
+  levelTitle: 'Niveau 1 : les cellules'
 }
