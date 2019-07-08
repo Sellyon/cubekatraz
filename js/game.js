@@ -2,7 +2,7 @@
 window.document.addEventListener('DOMContentLoaded', function () {
 
 	// web socket stuff
-    var socket = io('https://two-prisoners.herokuapp.com/');
+    var socket = io('https://cubekatraz.herokuapp.com/');
     //var socket = io('http://localhost:8080/');
 
     socket.on('connect', function () {
