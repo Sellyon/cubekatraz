@@ -32,6 +32,89 @@ exports.rules = {
     movingUp: false,
     movingDown: false,
   },
+  switches : [
+    {
+      x: 75,
+      y: 100,
+      width: 50,
+      height: 50,
+      id: 9,
+      color : [38, 102, 199],
+      activated: false
+    },
+    {
+      x: 225,
+      y: 100,
+      width: 50,
+      height: 50,
+      id: 5,
+      color : [20, 227, 121],
+      activated: false
+    },
+    {
+      x: 375,
+      y: 100,
+      width: 50,
+      height: 50,
+      id: 8,
+      color : [41, 156, 214],
+      activated: false
+    },
+    {
+      x: 525,
+      y: 100,
+      width: 50,
+      height: 50,
+      id: 7,
+      color : [33, 224, 237],
+      activated: false
+    },
+    {
+      x: 75,
+      y: 450,
+      width: 50,
+      height: 50,
+      id: 3,
+      color : [53, 214, 30],
+      activated: false
+    },
+    {
+      x: 225,
+      y: 450,
+      width: 50,
+      height: 50,
+      id: 4,
+      color : [28, 199, 61],
+      activated: false
+    },
+    {
+      x: 375,
+      y: 450,
+      width: 50,
+      height: 50,
+      id: 1,
+      color : [193, 227, 20],
+      activated: false
+    },
+    {
+      x: 525,
+      y: 450,
+      width: 50,
+      height: 50,
+      id: 6,
+      color : [32, 227, 183],
+      activated: false
+    },
+    {
+      x: 500,
+      y: 275,
+      width: 50,
+      height: 50,
+      id: 2,
+      color : [124, 237, 21],
+      activated: false
+    },
+  ],
   walls: [
     {
       x: 600,
@@ -53,98 +136,98 @@ exports.rules = {
       y: 0,
       width: 800,
       height: 50,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 0,
       y: 550,
       width: 800,
       height: 50,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 0,
       y: 50,
       width: 50,
       height: 150,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 150,
       y: 50,
       width: 50,
       height: 150,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 300,
       y: 50,
       width: 50,
       height: 150,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 450,
       y: 50,
       width: 50,
       height: 150,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 600,
       y: 50,
       width: 50,
       height: 150,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 750,
       y: 50,
       width: 50,
       height: 150,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 0,
       y: 400,
       width: 50,
       height: 150,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 150,
       y: 400,
       width: 50,
       height: 150,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 300,
       y: 400,
       width: 50,
       height: 150,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 450,
       y: 400,
       width: 50,
       height: 150,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 600,
       y: 400,
       width: 50,
       height: 150,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 750,
       y: 400,
       width: 50,
       height: 150,
-      color: '#6E2419',
+      color: '#6B4743',
     },
     {
       x: 50,
@@ -267,89 +350,6 @@ exports.rules = {
       }
     },
   ],
-  switches : [
-    {
-      x: 75,
-      y: 100,
-      width: 50,
-      height: 50,
-      id: 9,
-      color : [38, 102, 199],
-      activated: false
-    },
-    {
-      x: 225,
-      y: 100,
-      width: 50,
-      height: 50,
-      id: 5,
-      color : [20, 227, 121],
-      activated: false
-    },
-    {
-      x: 375,
-      y: 100,
-      width: 50,
-      height: 50,
-      id: 8,
-      color : [41, 156, 214],
-      activated: false
-    },
-    {
-      x: 525,
-      y: 100,
-      width: 50,
-      height: 50,
-      id: 7,
-      color : [33, 224, 237],
-      activated: false
-    },
-    {
-      x: 75,
-      y: 450,
-      width: 50,
-      height: 50,
-      id: 3,
-      color : [53, 214, 30],
-      activated: false
-    },
-    {
-      x: 225,
-      y: 450,
-      width: 50,
-      height: 50,
-      id: 4,
-      color : [28, 199, 61],
-      activated: false
-    },
-    {
-      x: 375,
-      y: 450,
-      width: 50,
-      height: 50,
-      id: 1,
-      color : [193, 227, 20],
-      activated: false
-    },
-    {
-      x: 525,
-      y: 450,
-      width: 50,
-      height: 50,
-      id: 6,
-      color : [32, 227, 183],
-      activated: false
-    },
-    {
-      x: 500,
-      y: 275,
-      width: 50,
-      height: 50,
-      id: 2,
-      color : [124, 237, 21],
-      activated: false
-    },
-  ],
   coins : [
   {
     x: 662,
@@ -365,6 +365,6 @@ exports.rules = {
   },
   ],
   instanceCounter: 0,
-  levelColor: '#9E7E6E',
+  levelColor: '#9D9775',
   levelTitle: 'Niveau 3 : les toilettes'
 }

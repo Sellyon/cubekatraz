@@ -163,21 +163,9 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			context.fillStyle = data.rules.levelColor;
 			context.fillRect(0, 0, canvas.width, canvas.height);
 
-			// draw walls
-			if (walls) {
-				for (var i = 0; i < walls.length; i++) {
-					if (walls[i].isDoor && walls[i].isDoor.isActivated) {
-						context.fillStyle = '#86949C';
-					} else {
-						context.fillStyle = walls[i].color;
-					}
-					context.fillRect(walls[i].x, walls[i].y, walls[i].width, walls[i].height);
-				}
-			}
-
 			// draw switches
 			if (switches) {
-				var opacitySwitches = ((Math.sin(instanceCounter / 1) + 2) / 2) / 2;
+				var opacitySwitches = ((Math.sin(instanceCounter / 2) + 2) / 2) / 2;
 				for (var i = 0; i < switches.length; i++) {
 					if (!switches[i].activated) {
 						context.fillStyle = 'rgba('+ switches[i].color[0] + ',' + switches[i].color[1] + ',' + switches[i].color[2] + ',' + opacitySwitches + ')';
@@ -186,6 +174,20 @@ window.document.addEventListener('DOMContentLoaded', function () {
 					context.strokeStyle = "#86949C";
 					context.lineWidth = '1';
 					context.strokeRect(switches[i].x + 2, switches[i].y + 2, switches[i].width - 4, switches[i].height - 4);
+				}
+			}
+
+			// draw walls
+			if (walls) {
+				for (var i = 0; i < walls.length; i++) {
+					if (walls[i].isDoor && walls[i].isDoor.isActivated && !walls[i].isFire) {
+						context.fillStyle = '#86949C';
+					} else if (walls[i].isFire) {
+						context.fillStyle = 'rgb(255, ' + (0 + (Math.round((Math.sin(instanceCounter * 2) + 1) * 122.5))) + ', 0)';
+					} else {
+						context.fillStyle = walls[i].color;
+					}
+					context.fillRect(walls[i].x, walls[i].y, walls[i].width, walls[i].height);
 				}
 			}
 
@@ -219,16 +221,19 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			if (player1 && player2 && data.player1Avatar && data.player2Avatar) {
 				var avatar;
 				var player;
+				var playerOpacity;
 				for (var i = 0; i < 2; i++) {
 					if (i === 0) {
 						avatar = data.player1Avatar;
 						player = player1;
+						playerOpacity = data.player1Opacity;
 					} else {
 						avatar = data.player2Avatar;
 						player = player2;
+						playerOpacity = data.player2Opacity;
 					}
 					for (var j = 0; j < avatar.length; j++) {
-						context.fillStyle = avatar[j].color;
+						context.fillStyle = 'rgba(' + avatar[j].color[0] + ',' + avatar[j].color[1] + ',' + avatar[j].color[2] + ',' + playerOpacity + ')';
 						context.fillRect(player.x + avatar[j].x, player.y + avatar[j].y, avatar[j].width, avatar[j].height);
 					}
 				}

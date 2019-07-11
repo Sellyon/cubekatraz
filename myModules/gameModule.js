@@ -8,7 +8,10 @@ const level1 = require(__dirname + '/level1.js');
 const level2 = require(__dirname + '/level2.js');
 const level3 = require(__dirname + '/level3.js');
 const level4 = require(__dirname + '/level4.js');
-const levelList = [level1, level2, level3, level4];
+const level5 = require(__dirname + '/level5.js');
+const level6 = require(__dirname + '/level6.js');
+const level7 = require(__dirname + '/level7.js');
+const levelList = [level1, level2, level3, level4, level5, level6, level7];
 
 const testCollisions = function (obj1, obj2, vecteurX, vecteurY) {
   let collisionDetected = false;
@@ -49,8 +52,41 @@ const testCollisions = function (obj1, obj2, vecteurX, vecteurY) {
   return {collisionDetected, horizontalCollision, verticalCollision, vecteurX, vecteurY}
 }
 
+const playerDeath = function (instance, i) {
+  let playerOpacity;
+  if (i === 0) {
+    instance.player1isDead = true;
+  } else {
+    instance.player2isDead = true;
+  }
+  let deathFade = setInterval(function ()
+    {
+      if (instance.player1Opacity <= 0 || instance.player2Opacity <= 0) {
+        instance.rules = lobbyMod.copyObject(instance.checkpoint.rules);
+        instance.player1Score = instance.checkpoint.player1Score;
+        instance.player2Score = instance.checkpoint.player2Score;
+        instance.player1Opacity = 1;
+        instance.player2Opacity = 1;
+        instance.player1isDead = false;
+        instance.player2isDead = false;
+        clearThisInterval();
+      } else {
+        if (i === 0) {
+          instance.player1Opacity -= 0.04;
+        } else {
+          instance.player2Opacity -= 0.04;
+        }
+      }
+    }, 40);
+  let clearThisInterval = function () {
+    clearInterval(deathFade);
+    console.log('interval cleared');
+  }
+}
+
 exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
   setInterval(function() {
+    let instance = instancesList[instanceNumber];
     let playerSpeed = 10;
     let collisionHorizontaleDetectee = false;
     let collisionVerticaleDetectee = false;
@@ -58,30 +94,30 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
     let collisionVerticaleBorder = false;
     let player;
     let otherPlayer;
-    let walls = instancesList[instanceNumber].rules.walls;
+    let walls = instance.rules.walls;
     let switches;
-    let finishZone = instancesList[instanceNumber].rules.finishZone;
+    let finishZone = instance.rules.finishZone;
     thisLoop = this;
-    if (!instancesList[instanceNumber].active) {
+    if (!instance.active) {
       console.log('ERROR THIS LOOP SHOULD BE CLEARED : ', thisLoop);
     }
-    if (instancesList[instanceNumber].rules.switches) {
-      switches = instancesList[instanceNumber].rules.switches;
+    if (instance.rules.switches) {
+      switches = instance.rules.switches;
     }
     let coins;
-    if (instancesList[instanceNumber].rules.coins) {
-      coins = instancesList[instanceNumber].rules.coins;
+    if (instance.rules.coins) {
+      coins = instance.rules.coins;
     }
 
-    for (var i = 0; i < 2; i++) {
+    for (var i = 0; i < 2 && !instance.player1isDead && !instance.player2isDead; i++) {
       let vecteurX = 0;
       let vecteurY = 0;
       if (i === 0) {
-        player = instancesList[instanceNumber].rules.player1;
-        otherPlayer = instancesList[instanceNumber].rules.player2;
+        player = instance.rules.player1;
+        otherPlayer = instance.rules.player2;
       } else {
-        player = instancesList[instanceNumber].rules.player2;
-        otherPlayer = instancesList[instanceNumber].rules.player1;
+        player = instance.rules.player2;
+        otherPlayer = instance.rules.player1;
       }
 
       if (player.movingLeft) {
@@ -99,23 +135,23 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
 
       // canvas border collisions tests
       // horizontal test
-      if (player.x + vecteurX > 0 && player.x + player.width + vecteurX < instancesList[instanceNumber].rules.levelDimension.width) {
+      if (player.x + vecteurX > 0 && player.x + player.width + vecteurX < instance.rules.levelDimension.width) {
         collisionHorizontaleBorder = false;
       } else {
         collisionHorizontaleBorder = true;
         if (vecteurX > 0) {
-          vecteurX = instancesList[instanceNumber].rules.levelDimension.width - (player.x + player.width);
+          vecteurX = instance.rules.levelDimension.width - (player.x + player.width);
         } else if (vecteurX < 0) {
           vecteurX = 0 - player.x;
         }
       }
       // vertical test
-      if (player.y + vecteurY > 0 && player.y + player.height + vecteurY < instancesList[instanceNumber].rules.levelDimension.height) {
+      if (player.y + vecteurY > 0 && player.y + player.height + vecteurY < instance.rules.levelDimension.height) {
         collisionVerticaleBorder = false;
       } else {
         collisionVerticaleBorder = true;
         if (vecteurY > 0) {
-          vecteurY = instancesList[instanceNumber].rules.levelDimension.height - (player.y + player.height);
+          vecteurY = instance.rules.levelDimension.height - (player.y + player.height);
         } else if (vecteurY < 0) {
           vecteurY = 0 - player.y;
         }
@@ -145,6 +181,11 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
         }
         // resolve specific collisions
         if (getCollisions.collisionDetected) {
+          if (walls[j].isFire) {
+            if (!instance.player1isDead && !instance.player2isDead) {
+              playerDeath(instance, i);
+            }
+          }
         }
       }
 
@@ -200,9 +241,9 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
           // resolve specific collisions
           if (getCollisions.collisionDetected) {
             if (i === 0) {
-              instancesList[instanceNumber].player1Score += 5;
+              instance.player1Score += 5;
             } else {
-              instancesList[instanceNumber].player2Score += 5;
+              instance.player2Score += 5;
             }
             coins.splice(l, 1);
             l--;
@@ -230,10 +271,13 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
       }
 
       if (finishZone.player1InZone && finishZone.player2InZone) {
-        instancesList[instanceNumber].level ++;
+        instance.level ++;
         let nextLevel = exports.instanceGenerator(serverSocketIO, instanceNumber, instancesList);
         if (typeof nextLevel === 'object') {
-          instancesList[instanceNumber].rules = nextLevel;
+          instance.rules = nextLevel;
+          instance.checkpoint.rules = lobbyMod.copyObject(nextLevel);
+          instance.checkpoint.player1Score = instance.player1Score;
+          instance.checkpoint.player2Score = instance.player2Score;
         }
       }
   
@@ -278,27 +322,27 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
       }
     }
 
-    //Fire walls moves
-    instancesList[instanceNumber].rules.instanceCounter += 0.05;
+    //Moving walls moves
+    instance.rules.instanceCounter += 0.05;
     for (var i = 0; i < walls.length; i++) {
-      if (walls[i].isFire) {
-        walls[i].x += Math.sin(instancesList[instanceNumber].rules.instanceCounter) * 4
+      if (walls[i].isMoving) {
+        walls[i].x += Math.sin(instance.rules.instanceCounter) * 4
       }
     }
 
-    instancesList[instanceNumber].elapsedTime ++;
+    instance.elapsedTime ++;
 
-    if (instancesList[instanceNumber].active) {
-      serverSocketIO.emit('updateFrontElements', instancesList[instanceNumber]);
+    if (instance.active) {
+      serverSocketIO.emit('updateFrontElements', instance);
     } else {
       clearInterval(thisLoop);
       serverSocketIO.emit('setVictoryScreen', instancesList[instanceNumber]);
       let newMatch = { 
-        player1:instancesList[instanceNumber].player1Name,
-        player2:instancesList[instanceNumber].player2Name,
-        score:instancesList[instanceNumber].player1Score + instancesList[instanceNumber].player2Score,
+        player1:instance.player1Name,
+        player2:instance.player2Name,
+        score:instance.player1Score + instance.player2Score,
         victory:true,
-        time:instancesList[instanceNumber].elapsedTime*40,
+        time:instance.elapsedTime*40,
         date:Date.now()
       }
       client.connect(uri, function () {
@@ -317,14 +361,17 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
 exports.updatePlayerMoves = function (socket, instancesList, moves, instanceRegex) {
   let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
   let player;
+  let playerIsDead;
   if (lobbyMod.getHandshakeId(socket) === instancesList[instanceRequired - 1].player1Id) {
     player = instancesList[instanceRequired - 1].rules.player1;
+    playerIsDead = instancesList[instanceRequired - 1].player1isDead;
   } else if (lobbyMod.getHandshakeId(socket) === instancesList[instanceRequired - 1].player2Id) {
     player = instancesList[instanceRequired - 1].rules.player2;
+    playerIsDead = instancesList[instanceRequired - 1].player1isDead;
   } else {
     return false
   }
-  if (player) {
+  if (player && !playerIsDead) {
     if (moves.movingUp === true || moves.movingUp === false) {
       player.movingUp = moves.movingUp;
     }

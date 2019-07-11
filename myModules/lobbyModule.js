@@ -54,14 +54,14 @@ exports.getCubeAvatar = function (image) {
       y: 0,
       width: 50,
       height: 20,
-      color: '#BADEEE'
+      color: [186, 222, 238]
     },
     {
       x: 0,
       y: 20,
       width: 50,
       height: 30,
-      color: '#FF6600'
+      color: [255, 102, 0]
     }
     ]
   } else if (image === 'cody.jpg') {
@@ -71,35 +71,35 @@ exports.getCubeAvatar = function (image) {
       y: 0,
       width: 50,
       height: 10,
-      color: '#E5ECF4'
+      color: [229, 236, 244]
     },
     {
       x: 0,
       y: 10,
       width: 50,
       height: 10,
-      color: '#4C5EC8'
+      color: [76, 94, 200]
     },
     {
       x: 0,
       y: 20,
       width: 50,
       height: 10,
-      color: '#E5ECF4'
+      color: [229, 236, 244]
     },
     {
       x: 0,
       y: 30,
       width: 50,
       height: 10,
-      color: '#4C5EC8'
+      color: [76, 94, 200]
     },
     {
       x: 0,
       y: 40,
       width: 50,
       height: 10,
-      color: '#E5ECF4'
+      color: [229, 236, 244]
     }
     ]
   } else {
@@ -109,38 +109,48 @@ exports.getCubeAvatar = function (image) {
       y: 0,
       width: 50,
       height: 10,
-      color: '#FFE80E'
+      color: [255, 232, 14]
     },
     {
       x: 0,
       y: 10,
       width: 50,
       height: 10,
-      color: '#090901'
+      color: [9, 9, 1]
     },
     {
       x: 0,
       y: 20,
       width: 50,
       height: 10,
-      color: '#FFE80E'
+      color: [255, 232, 14]
     },
     {
       x: 0,
       y: 30,
       width: 50,
       height: 10,
-      color: '#090901'
+      color: [9, 9, 1]
     },
     {
       x: 0,
       y: 40,
       width: 50,
       height: 10,
-      color: '#FFE80E'
+      color: [255, 232, 14]
     }
     ]
   }
+}
+
+exports.copyObject = function (original) {
+  // Function used to create checkpoint at the beginning of a room and reload when a player die
+  try{
+      var copy = JSON.parse(JSON.stringify(original));
+  } catch(ex){
+      alert("Vous utilisez un vieux navigateur bien pourri, qui n'est pas pris en charge par ce site");
+  }
+  return copy;
 }
 
 exports.initiateEvasionCountDown = function (serverSocketIO, countDownStarted, countDownForbidden, instancesList, avatarSlot1, avatarSlot2) {
@@ -161,18 +171,27 @@ exports.initiateEvasionCountDown = function (serverSocketIO, countDownStarted, c
             player1Id: avatarSlot1.status,
             player1Name: avatarSlot1.name,
             player1Image: avatarSlot1.image,
+            player1Opacity: 1,
+            player1isDead: false,
             player1Avatar: exports.getCubeAvatar(avatarSlot1.image),
             player1Score: 0,
             player2Id: avatarSlot2.status,
             player2Name: avatarSlot2.name,
             player2Image: avatarSlot2.image,
+            player2Opacity: 1,
+            player2isDead: false,
             player2Avatar: exports.getCubeAvatar(avatarSlot2.image),
             player2Score: 0,
             level: 1,
             elapsedTime: 0,
-            active: true
+            active: true,
+            checkpoint: {}
           });
+          // Settings for created instance
           instancesList[instancesList.length - 1].rules = gameMod.instanceGenerator(serverSocketIO, instancesList.length - 1, instancesList);
+          instancesList[instancesList.length - 1].checkpoint.rules = exports.copyObject(instancesList[instancesList.length - 1].rules);
+          instancesList[instancesList.length - 1].checkpoint.player1Score = instancesList[instancesList.length - 1].player1Score;
+          instancesList[instancesList.length - 1].checkpoint.player2Score = instancesList[instancesList.length - 1].player2Score;
           var destination = '/game/' + instancesList.length;
           serverSocketIO.emit('redirectToGameInstance', {
             url: destination,
