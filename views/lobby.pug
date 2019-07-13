@@ -31,6 +31,7 @@ html
         var parentMatches = matches.parentNode;
         var outOfAutoScroll = false;
         var playerList = [];
+        var instancesList = [];
         var yourUserName = '!{message}';
         var updateSlots = function (slot) {
           if (slot.status === 'empty') {
@@ -60,7 +61,8 @@ html
         socket.emit('giveUserName', yourUserName);
 
         socket.addEventListener('updatePlayerList', function(data){
-          playerList = data;
+          playerList = data.playerList;
+          instancesList = data.instancesList;
           socket.emit('nameInFrontUpdated', 'Name in front is ok');
         });
 
@@ -68,11 +70,14 @@ html
           while (parentConnected.lastChild !== connected) {
               parentConnected.removeChild(parentConnected.lastChild);
           }
-          var sortedList = playerList.sort(function (a, b) {
+          while (parentMatches.lastChild !== matches) {
+              parentMatches.removeChild(parentMatches.lastChild);
+          }
+          var sortedPlayerList = playerList.sort(function (a, b) {
             return a.name.localeCompare(b.name);
           });
-          for (let i = 0; i < sortedList.length; i++) {
-            var playerName = sortedList[i].name;
+          for (let i = 0; i < sortedPlayerList.length; i++) {
+            var playerName = sortedPlayerList[i].name;
             var newTextP = document.createElement("p");
             var newTextA = document.createElement("A");
             var newContent = document.createTextNode(playerName);
@@ -80,6 +85,34 @@ html
             newTextP.appendChild(newTextA)
             parentConnected.insertBefore(newTextP, parentConnected.childNodes[parentConnected.childNodes.length]);
             parentConnected.lastChild.children[0].href = 'profil/' + playerName;
+          }
+          if (instancesList.length > 0) {
+            for (let j = 0; j < instancesList.length; j++) {
+              if (instancesList[j].active) {
+                var player1Name = instancesList[j].player1Name;
+                var player2Name = instancesList[j].player2Name;
+                var newTextP = document.createElement("p");
+                var newTextA1 = document.createElement("A");
+                var newTextEt = document.createElement("A");
+                var newTextA2 = document.createElement("A");
+                var newContentA1 = document.createTextNode(player1Name);
+                var newContentEt = document.createTextNode(' et ');
+                var newContentA2 = document.createTextNode(player2Name);
+                newTextA1.appendChild(newContentA1);
+                newTextA1.appendChild(newContentEt);
+                newTextA1.appendChild(newContentA2);
+                newTextP.appendChild(newTextA1);
+                newTextP.appendChild(newTextEt);
+                newTextP.appendChild(newTextA2);
+                parentMatches.insertBefore(newTextP, parentMatches.childNodes[parentMatches.childNodes.length]);
+                parentMatches.lastChild.children[0].href = 'game/' + (j + 1);
+              }
+            }
+          } else {
+            var newTextP = document.createElement("p");
+            var newContent = document.createTextNode('Aucune évasion en cours.');
+            newTextP.appendChild(newContent);
+            parentMatches.insertBefore(newTextP, parentMatches.childNodes[parentMatches.childNodes.length]);
           }
         });
 

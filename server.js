@@ -77,14 +77,14 @@ let countDownStarted = false;
 let countDownForbidden = false;
 
 let updateFrontPlayerList = function () {
-	serverSocketIO.emit('updatePlayerList', playerList);
+	serverSocketIO.emit('updatePlayerList', {playerList: playerList, instancesList: instancesList});
 };
 
 const lobbyRegex = /\Wlobby$/i;
 
 serverSocketIO.on('connection', function (socket) {
 	if (lobbyRegex.test(socket.handshake.headers.referer)) {
-	    console.log('Serveur dit : Connecté au navigateur, bienvenu au lobby ' + lobbyMod.getHandshakeId(socket));
+	    console.log('Bienvenu au lobby ' + lobbyMod.getHandshakeId(socket));
 
 		connectedNumber ++;
 
@@ -253,9 +253,10 @@ serverSocketIO.on('connection', function (socket) {
 	if (gameRegex.test(socket.handshake.headers.referer)) {
 		let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
 		if (instancesList[instanceRequired - 1] && instancesList[instanceRequired - 1].active) {
-			console.log('Serveur dit : Connecté au navigateur, dans la partie '+ instanceRequired + ', demande faite par ' + lobbyMod.getHandshakeId(socket));
-			if (true && !instancesList[instanceRequired - 1].rules.levelStarted) {
-				instancesList[instanceRequired - 1].rules.levelStarted = true;
+			socket.join('room' + instanceRequired);
+			console.log(lobbyMod.getHandshakeId(socket) + ' rejoint l\'instance \"room' + instanceRequired + '\"');
+			if (!instancesList[instanceRequired - 1].matchStarted) {
+				instancesList[instanceRequired - 1].matchStarted = true;
 				gameMod.mainLoop(serverSocketIO, instanceRequired - 1, instancesList);
 				console.log('level ' + instanceRequired + ' started');
 				socket.on('updatePlayerList', function (moves) {
@@ -266,8 +267,23 @@ serverSocketIO.on('connection', function (socket) {
 			socket.on('playerMove', function (moves) {
 				gameMod.updatePlayerMoves(socket, instancesList, moves, instanceRegex);
 			});
+			// if a player is reconnected in a room, we update instance settings
+			if (lobbyMod.getHandshakeId(socket) === instancesList[instanceRequired - 1].player1Id) {
+				instancesList[instanceRequired - 1].player1Disconnected = false;
+			} else if (lobbyMod.getHandshakeId(socket) === instancesList[instanceRequired - 1].player2Id) {
+				instancesList[instanceRequired - 1].player2Disconnected = false;
+			}
+			socket.on('disconnect', function () {
+				socket.leave('room' + instanceRequired);
+				// if a player is disconnected from a room, we update instance settings
+				if (lobbyMod.getHandshakeId(socket) === instancesList[instanceRequired - 1].player1Id) {
+					instancesList[instanceRequired - 1].player1Disconnected = true;
+				} else if (lobbyMod.getHandshakeId(socket) === instancesList[instanceRequired - 1].player2Id) {
+					instancesList[instanceRequired - 1].player2Disconnected = true;
+				}
+			});
 		} else {
-			console.log('Serveur dit : l\'accès à l\'instance ' + instanceRequired + ' est refusé, demande faite par ' + lobbyMod.getHandshakeId(socket));
+			console.log('L\'accès à l\'instance \"room' + instanceRequired + '\"" est refusé, demande faite par ' + lobbyMod.getHandshakeId(socket));
 			socket.emit('redirectToLobby');
 		}
 	}

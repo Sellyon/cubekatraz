@@ -173,6 +173,7 @@ exports.initiateEvasionCountDown = function (serverSocketIO, countDownStarted, c
             player1Image: avatarSlot1.image,
             player1Opacity: 1,
             player1isDead: false,
+            player1Disconnected: false,
             player1Avatar: exports.getCubeAvatar(avatarSlot1.image),
             player1Score: 0,
             player2Id: avatarSlot2.status,
@@ -180,11 +181,14 @@ exports.initiateEvasionCountDown = function (serverSocketIO, countDownStarted, c
             player2Image: avatarSlot2.image,
             player2Opacity: 1,
             player2isDead: false,
+            player2Disconnected: false,
+            disconnectionTimer: 750, // 750*40 = 30 000 ms
             player2Avatar: exports.getCubeAvatar(avatarSlot2.image),
             player2Score: 0,
             level: 1,
             elapsedTime: 0,
             active: true,
+            victory: false,
             checkpoint: {}
           });
           // Settings for created instance

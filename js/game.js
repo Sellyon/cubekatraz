@@ -36,6 +36,8 @@ window.document.addEventListener('DOMContentLoaded', function () {
 		var player2NameInGame = document.getElementById('player2NameInGame');
 		var player2ScoreInGame = document.getElementById('player2ScoreInGame');
 		var elapsedTimeInGame = document.getElementById('elapsedTimeInGame');
+		var disconnectionIssues = document.getElementById('disconnectionIssues');
+		var disconnectionText = document.getElementById('disconnectionText');
 
 		window.onkeydown = function(event) {
 			var e = event || window.event;
@@ -243,6 +245,29 @@ window.document.addEventListener('DOMContentLoaded', function () {
 				context.font = '12px Arial';
 				context.fillText(data.player1Name, player1.x, player1.y - 12);
 				context.fillText(data.player2Name, player2.x, player2.y - 12);
+			}
+
+			// show connection issues
+			if (data.player1Disconnected || data.player2Disconnected) {
+				var onScreenTimer = (Math.round(data.disconnectionTimer * 40 / 1000));
+				disconnectionIssues.style.visibility = 'visible';
+				if (data.player1Disconnected) {
+					disconnectionText.innerHTML = data.player1Name + ' est déconnecté, ' + onScreenTimer + 's avant la fermeture de la partie.';
+				}
+				if (data.player2Disconnected) {
+					disconnectionText.innerHTML = data.player2Name + ' est déconnecté, ' + onScreenTimer + 's avant la fermeture de la partie.';
+				}
+				// this message is created for potential spectators
+				if (data.player1Disconnected && data.player2Disconnected) {
+					disconnectionText.innerHTML = data.player1Name + ' et ' + data.player2Name + ' sont déconnectés, ' + onScreenTimer + 's avant la fermeture de la partie.';
+				}
+
+				// if disconnection timer reach 0 we send all spectators to the lobby :
+				if (data.disconnectionTimer <= 0) {
+					window.location.href = '/lobby';
+				}
+			} else {
+				disconnectionIssues.style.visibility = 'hidden';
 			}
 		});
 		socket.addEventListener('setVictoryScreen', function(data){

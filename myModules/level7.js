@@ -39,7 +39,7 @@ exports.rules = {
       width: 50,
       height: 400,
       id: 1,
-      color : [93, 207, 108],
+      color : [193, 196, 217],
       activated: false
     },
     {
@@ -48,7 +48,7 @@ exports.rules = {
       width: 50,
       height: 400,
       id: 2,
-      color : [78, 171, 255],
+      color : [193, 196, 217],
       activated: false
     },
     {
@@ -57,7 +57,7 @@ exports.rules = {
       width: 50,
       height: 400,
       id: 3,
-      color : [93, 207, 108],
+      color : [193, 196, 217],
       activated: false
     },
     {
@@ -66,18 +66,11 @@ exports.rules = {
       width: 50,
       height: 400,
       id: 4,
-      color : [78, 171, 255],
+      color : [193, 196, 217],
       activated: false
     }
   ],
   walls: [
-    {
-      x: 0,
-      y: 0,
-      width: 800,
-      height: 50,
-      color: '#663D30',
-    },
     {
       x: 250,
       y: 250,
@@ -108,18 +101,26 @@ exports.rules = {
     },
     {
       x: 0,
-      y: 550,
-      width: 800,
-      height: 50,
-      color: '#663D30',
-    },
-    {
-      x: 0,
       y: 50,
       width: 200,
       height: 50,
-      color: "#4EABFF",
+      color: "#663D30",
       isFire: true,
+      isDoor : {
+        id: 1,
+        horizMaxPot: 0,
+        xGauge: 0,
+        vertMaxPot: -200,
+        yGauge: -200,
+        activated: false
+      }
+    },
+    {
+      x: 0,
+      y: -300,
+      width: 200,
+      height: 350,
+      color: "#663D30",
       isDoor : {
         id: 1,
         horizMaxPot: 0,
@@ -134,8 +135,23 @@ exports.rules = {
       y: 50,
       width: 200,
       height: 50,
-      color: "#4EABFF",
+      color: "#663D30",
       isFire: true,
+      isDoor : {
+        id: 2,
+        horizMaxPot: 0,
+        xGauge: 0,
+        vertMaxPot: -200,
+        yGauge: -200,
+        activated: false
+      }
+    },
+    {
+      x: 200,
+      y: -300,
+      width: 200,
+      height: 350,
+      color: "#663D30",
       isDoor : {
         id: 2,
         horizMaxPot: 0,
@@ -150,8 +166,23 @@ exports.rules = {
       y: 50,
       width: 200,
       height: 50,
-      color: "#4EABFF",
+      color: "#663D30",
       isFire: true,
+      isDoor : {
+        id: 3,
+        horizMaxPot: 0,
+        xGauge: 0,
+        vertMaxPot: -200,
+        yGauge: -200,
+        activated: false
+      }
+    },
+    {
+      x: 400,
+      y: -300,
+      width: 200,
+      height: 350,
+      color: "#663D30",
       isDoor : {
         id: 3,
         horizMaxPot: 0,
@@ -166,8 +197,23 @@ exports.rules = {
       y: 50,
       width: 200,
       height: 50,
-      color: "#4EABFF",
+      color: "#663D30",
       isFire: true,
+      isDoor : {
+        id: 4,
+        horizMaxPot: 0,
+        xGauge: 0,
+        vertMaxPot: -200,
+        yGauge: -200,
+        activated: false
+      }
+    },
+    {
+      x: 600,
+      y: -300,
+      width: 200,
+      height: 350,
+      color: "#663D30",
       isDoor : {
         id: 4,
         horizMaxPot: 0,
@@ -182,8 +228,23 @@ exports.rules = {
       y: 500,
       width: 200,
       height: 50,
-      color: "#4EABFF",
+      color: "#663D30",
       isFire: true,
+      isDoor : {
+        id: 1,
+        horizMaxPot: 0,
+        xGauge: 0,
+        vertMaxPot: 200,
+        yGauge: 200,
+        activated: false
+      }
+    },
+    {
+      x: 0,
+      y: 550,
+      width: 200,
+      height: 350,
+      color: "#663D30",
       isDoor : {
         id: 1,
         horizMaxPot: 0,
@@ -198,8 +259,23 @@ exports.rules = {
       y: 500,
       width: 200,
       height: 50,
-      color: "#4EABFF",
+      color: "#663D30",
       isFire: true,
+      isDoor : {
+        id: 2,
+        horizMaxPot: 0,
+        xGauge: 0,
+        vertMaxPot: 200,
+        yGauge: 200,
+        activated: false
+      }
+    },
+    {
+      x: 200,
+      y: 550,
+      width: 200,
+      height: 350,
+      color: "#663D30",
       isDoor : {
         id: 2,
         horizMaxPot: 0,
@@ -214,8 +290,23 @@ exports.rules = {
       y: 500,
       width: 200,
       height: 50,
-      color: "#4EABFF",
+      color: "#663D30",
       isFire: true,
+      isDoor : {
+        id: 3,
+        horizMaxPot: 0,
+        xGauge: 0,
+        vertMaxPot: 200,
+        yGauge: 200,
+        activated: false
+      }
+    },
+    {
+      x: 400,
+      y: 550,
+      width: 200,
+      height: 350,
+      color: "#663D30",
       isDoor : {
         id: 3,
         horizMaxPot: 0,
@@ -230,8 +321,23 @@ exports.rules = {
       y: 500,
       width: 200,
       height: 50,
-      color: "#4EABFF",
+      color: "#663D30",
       isFire: true,
+      isDoor : {
+        id: 4,
+        horizMaxPot: 0,
+        xGauge: 0,
+        vertMaxPot: 200,
+        yGauge: 200,
+        activated: false
+      }
+    },
+    {
+      x: 600,
+      y: 550,
+      width: 200,
+      height: 350,
+      color: "#663D30",
       isDoor : {
         id: 4,
         horizMaxPot: 0,
@@ -270,5 +376,5 @@ exports.rules = {
   ],
   instanceCounter: 0,
   levelColor: '#C1C4D9',
-  levelTitle: 'Niveau 7 : La gauffrière'
+  levelTitle: 'Niveau 7 : Le gauffrier'
 }
