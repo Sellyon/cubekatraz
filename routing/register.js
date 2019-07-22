@@ -27,13 +27,23 @@ router.use(session({
   resave: false
 }));
 
+const getAvatar = function (req) {
+	if (req.session && req.session.avatar) {
+		return '/images/usersAvatars/' + req.session.avatar
+	} else {
+		return '/images/usersAvatars/placeholderAvatar.png'
+	}
+}
+
 
 router.get('/', function(req, res) {
 	let message = 'Complétez le formulaire pour vous enregistrer.'
+	let connected = false;
 	if (req.session && req.session.user) {
 		message = routMod.getUserName(req) + ', vous êtes déjà enregistré :)'
+		connected = true;
 	}
-	res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message});
+	res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message, avatar: getAvatar(req), connected: connected});
 })
 
 router.post('/', function(req, res) {
@@ -65,12 +75,12 @@ router.post('/', function(req, res) {
 					console.log("1 document inserted");
 					req.session.user = login;
 					message = 'enregistrement réussie ' + routMod.getUserName(req) + ', bienvenu à Cubekatraz :)';
-					res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message});
+					res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message, avatar: getAvatar(req)});
 					client.close();
 				});
 			} else {
 			  	message = 'Ce pseudo est déjà utilisé, choisis-en un autre.';
-			  	res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message});
+			  	res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message, avatar: getAvatar(req)});
 			  	client.close();
 			}
 		});

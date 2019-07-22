@@ -237,6 +237,7 @@ exports.rules = {
       color: '#7CED15',
       isDoor : {
         id: 2,
+        speed: 2,
         horizMaxPot: 0,
         xGauge: 0,
         vertMaxPot: 100,
@@ -252,6 +253,7 @@ exports.rules = {
       color: '#35D61E',
       isDoor : {
         id: 3,
+        speed: 2,
         horizMaxPot: 0,
         xGauge: 0,
         vertMaxPot: 100,
@@ -267,6 +269,7 @@ exports.rules = {
       color: '#1CC73D',
       isDoor : {
         id: 4,
+        speed: 2,
         horizMaxPot: 0,
         xGauge: 0,
         vertMaxPot: 100,
@@ -282,6 +285,7 @@ exports.rules = {
       color: '#14E379',
       isDoor : {
         id: 5,
+        speed: 2,
         horizMaxPot: 0,
         xGauge: 0,
         vertMaxPot: 100,
@@ -297,6 +301,7 @@ exports.rules = {
       color: '#20E3B7',
       isDoor : {
         id: 6,
+        speed: 2,
         horizMaxPot: 0,
         xGauge: 0,
         vertMaxPot: -100,
@@ -312,6 +317,7 @@ exports.rules = {
       color: '#21E0ED',
       isDoor : {
         id: 7,
+        speed: 2,
         horizMaxPot: 0,
         xGauge: 0,
         vertMaxPot: -100,
@@ -327,6 +333,7 @@ exports.rules = {
       color: '#299CD6',
       isDoor : {
         id: 8,
+        speed: 2,
         horizMaxPot: 0,
         xGauge: 0,
         vertMaxPot: -100,
@@ -342,6 +349,7 @@ exports.rules = {
       color: '#2666C7',
       isDoor : {
         id: 9,
+        speed: 2,
         horizMaxPot: 0,
         xGauge: 0,
         vertMaxPot: -100,
@@ -366,5 +374,5 @@ exports.rules = {
   ],
   instanceCounter: 0,
   levelColor: '#9D9775',
-  levelTitle: 'Niveau 3 : les toilettes'
+  levelTitle: 'Les toilettes'
 }

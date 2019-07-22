@@ -335,5 +335,5 @@ exports.rules = {
   ],
   instanceCounter: 0,
   levelColor: '#2E3D42',
-  levelTitle: 'Niveau 4 : Les conduits d\'aération'
+  levelTitle: 'Les conduits d\'aération'
 }

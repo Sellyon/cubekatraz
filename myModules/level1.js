@@ -205,5 +205,5 @@ exports.rules = {
   ],
   instanceCounter: 0,
   levelColor: '#D9D1D7',
-  levelTitle: 'Niveau 1 : les cellules'
+  levelTitle: 'Les cellules'
 }

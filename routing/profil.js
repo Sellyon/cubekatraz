@@ -27,11 +27,23 @@ router.use(session({
   resave: false
 }));
 
+const getAvatar = function (req) {
+	if (req.session && req.session.avatar) {
+		return '/images/usersAvatars/' + req.session.avatar
+	} else {
+		return '/images/usersAvatars/placeholderAvatar.png'
+	}
+}
+
 router.get('/', [routMod.requireLogin], function (req, res) {
 	res.redirect('/profil/' + routMod.getUserName(req));
 });
 
 router.get('/:profilName', function (req, res) {
+	connected = false;
+	if (req.session && req.session.user) {
+		connected = true
+	}
 	client.connect(uri, function () {
 		myDB = client.get().db('twoPrisoners');
 		let collection = myDB.collection('users');
@@ -53,7 +65,9 @@ router.get('/:profilName', function (req, res) {
 				gameFinished: data[0].gameFinished,
 				bestTime: data[0].bestTime,
 				friends: data[0].friends,
-				avatar: '/images/usersAvatars/' + data[0].avatar
+				avatarProfil: '/images/usersAvatars/' + data[0].avatar,
+				avatar: getAvatar(req),
+				connected: connected
 			});
 		  } else {
 		  	res.redirect('/unknowned');

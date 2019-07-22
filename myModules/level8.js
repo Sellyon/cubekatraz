@@ -77,6 +77,7 @@ exports.rules = {
       isFire: true,
       isDoor : {
         id: 2,
+        speed: 0.5,
         horizMaxPot: 0,
         xGauge: 0,
         vertMaxPot: -250,
@@ -108,6 +109,7 @@ exports.rules = {
       isFire: true,
       isDoor : {
         id: 2,
+        speed: 0.5,
         horizMaxPot: 0,
         xGauge: 0,
         vertMaxPot: -250,
@@ -298,5 +300,5 @@ exports.rules = {
   ],
   instanceCounter: 0,
   levelColor: '#9B8AA1',
-  levelTitle: 'Niveau 8 : Le vide-ordure'
+  levelTitle: 'Le vide-ordure'
 }

@@ -27,17 +27,23 @@ window.document.addEventListener('DOMContentLoaded', function () {
 		var elapsedTime;
 		var player1Score;
 		var player2Score;
+		var player1Deaths;
+		var player2Deaths;
 		var player1Name;
 		var player2Name;
 
+		var levelNumber = document.getElementById('levelNumber');
 		var levelTitle = document.getElementById('levelTitle');
 		var player1NameInGame = document.getElementById('player1NameInGame');
 		var player1ScoreInGame = document.getElementById('player1ScoreInGame');
+		var player1DeathsInGame = document.getElementById('player1DeathsInGame');
 		var player2NameInGame = document.getElementById('player2NameInGame');
 		var player2ScoreInGame = document.getElementById('player2ScoreInGame');
+		var player2DeathsInGame = document.getElementById('player2DeathsInGame');
 		var elapsedTimeInGame = document.getElementById('elapsedTimeInGame');
 		var disconnectionIssues = document.getElementById('disconnectionIssues');
 		var disconnectionText = document.getElementById('disconnectionText');
+		var victoryButton = document.getElementById('victoryButton');
 
 		window.onkeydown = function(event) {
 			var e = event || window.event;
@@ -122,6 +128,11 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			}
 		}
 
+		victoryButton.addEventListener('click', function (evt) {
+          evt.preventDefault();
+          window.location.href = '/hallOfFame';
+        });
+
 		socket.addEventListener('updateFrontElements', function(data){
 			player1 = data.rules.player1;
 			player2 = data.rules.player2;
@@ -133,11 +144,14 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			elapsedTime = data.elapsedTime * 40;
 			player1Score = data.player1Score;
 			player2Score = data.player2Score;
+			player1Deaths = data.player1Deaths;
+			player2Deaths = data.player2Deaths;
 			player1Name = data.player1Name;
 			player2Name = data.player2Name;
 
 			// UPDATE TEXTS
 			// update level title
+			levelNumber.innerHTML = 'Niveau ' + data.level;
 			levelTitle.innerHTML = data.rules.levelTitle;
 
 			// update HUD
@@ -155,9 +169,11 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			})();
 
 			player1NameInGame.innerHTML = player1Name;
-			player1ScoreInGame.innerHTML = player1Score;
+			player1ScoreInGame.innerHTML = 'score : ' + player1Score;
+			player1DeathsInGame.innerHTML = 'morts : ' + player1Deaths;
 			player2NameInGame.innerHTML = player2Name;
-			player2ScoreInGame.innerHTML = player2Score;
+			player2ScoreInGame.innerHTML = 'score : ' + player2Score;
+			player2DeathsInGame.innerHTML = 'morts : ' + player2Deaths;
 
 			context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -293,15 +309,15 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			// draw texts
 			context.fillStyle = 'black';
 			context.font = '24px Arial';
-			context.fillText('Evasion réussie !', 300, 50);
+			context.fillText('Evasion réussie !', 250, 50);
 
 			context.fillStyle = 'black';
 			context.font = '16px Arial';
 			context.fillText('Score de ' + data.player1Name + ' : ' + data.player1Score, 250, 100);
 			context.fillText('Score de ' + data.player2Name + ' : ' + data.player2Score, 250, 125);
 			context.fillText('Score total : ' + (data.player1Score +  data.player2Score), 250, 150);
-			context.fillText('Temps écoulé : ' + finalTime, 300, 175);
-			document.getElementById('victoryButton').style.visibility = 'visible';
+			context.fillText('Temps écoulé : ' + finalTime, 250, 175);
+			victoryButton.style.visibility = 'visible';
 		});
 	});
 });

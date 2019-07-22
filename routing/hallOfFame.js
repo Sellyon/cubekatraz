@@ -27,19 +27,34 @@ router.use(session({
 	resave: false
 }));
 
+const getAvatar = function (req) {
+	if (req.session && req.session.avatar) {
+		return '/images/usersAvatars/' + req.session.avatar
+	} else {
+		return '/images/usersAvatars/placeholderAvatar.png'
+	}
+}
+
 router.get('/', function (req, res) {
+	let connected = false;
+	if (req.session && req.session.user) {
+		connected = true;
+	}
 	client.connect(uri, function () {
 		myDB = client.get().db('twoPrisoners');
 		let collection = myDB.collection('matchs');
-		collection.find().sort({score: -1}).limit(5).toArray(function(err, data){
+		collection.find().sort({score: -1}).toArray(function(err, data){
 			for (let i = 0; i < data.length; i++) {
 				data[i].time = routMod.msToTime(data[i].time);
 				data[i].date = routMod.convertDateNowToEuropeanDate(data[i].date);
 				data[i].victory = routMod.getVictoryMessage(data[i].victory);
 			}
 			res.render('hallOfFame', { 
-				profil: routMod.getUserName(req), title: 'profil ' + req.params.profilName,
+				profil: routMod.getUserName(req),
+				title: 'Panthéon',
 				data: data,
+				avatar: getAvatar(req),
+				connected: connected
 			});
 			client.close();
 		});

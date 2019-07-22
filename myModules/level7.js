@@ -52,7 +52,7 @@ exports.rules = {
       activated: false
     },
     {
-      x: 350,
+      x: 400,
       y: 100,
       width: 50,
       height: 400,
@@ -61,7 +61,7 @@ exports.rules = {
       activated: false
     },
     {
-      x: 500,
+      x: 650,
       y: 100,
       width: 50,
       height: 400,
@@ -376,5 +376,5 @@ exports.rules = {
   ],
   instanceCounter: 0,
   levelColor: '#C1C4D9',
-  levelTitle: 'Niveau 7 : Le gauffrier'
+  levelTitle: 'Le gauffrier'
 }

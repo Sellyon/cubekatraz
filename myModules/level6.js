@@ -84,14 +84,14 @@ exports.rules = {
     {
       x: 0,
       y: 350,
-      width: 150,
+      width: 100,
       height: 50,
       color: "#4EABFF",
       isFire: true,
       isDoor : {
         id: 1,
-        horizMaxPot: -100,
-        xGauge: -100,
+        horizMaxPot: -150,
+        xGauge: -150,
         vertMaxPot: 0,
         yGauge: 0,
         activated: false
@@ -211,5 +211,5 @@ exports.rules = {
   ],
   instanceCounter: 0,
   levelColor: '#C1C4D9',
-  levelTitle: 'Niveau 6 : La salle à brochettes'
+  levelTitle: 'La salle à brochettes'
 }

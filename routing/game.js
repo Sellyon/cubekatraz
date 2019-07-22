@@ -18,7 +18,15 @@ const store = new MongoDBStore({
   });
   store.on('error', function(error) {
 	console.log(error);
-  });
+});
+
+const getAvatar = function (req) {
+  if (req.session && req.session.avatar) {
+    return '/images/usersAvatars/' + req.session.avatar
+  } else {
+    return '/images/usersAvatars/placeholderAvatar.png'
+  }
+}
 
 router.use(session({
   secret: secret,
@@ -28,7 +36,7 @@ router.use(session({
 }));
 
 router.get('/:number', [routMod.requireLogin], function(req, res) {
-    res.render('game', { profil: routMod.getUserName(req), title: 'index', message: routMod.getUserName(req)});
+  res.render('game', { profil: routMod.getUserName(req), title: 'index', message: routMod.getUserName(req), avatar: getAvatar(req)});
 })
 
 module.exports = router;

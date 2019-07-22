@@ -7,18 +7,17 @@ nav
         a(href='/lobby') JOUER
       li
         a(href='/hallOfFame') PANTHEON
-      li
-        a(href='http://yoannmroz.yj.fr/') PORTFOLIO
   div#userManage
     ul
-      li
-        a(href='/login') Se connecter 
-      li
-        a(href='/register') S'enregistrer 
+      if !connected
+        li
+          a(href='/login') Se connecter
+      else
+        li
+          a(href='/disconnect') Se deconnecter
       li
         a(href='/profil') Profil
   div#profil
     p
-      | Profil : 
-      span
-        = profil
+      a(href='/profil')
+        img(src=avatar, id="avatarMini", height='42px', width='42px', title=profil, alt='avatar de l\'utilisateur')

@@ -15,6 +15,14 @@ const store = new MongoDBStore({
 	console.log(error);
 });
 
+const getAvatar = function (req) {
+	if (req.session && req.session.avatar) {
+		return '/images/usersAvatars/' + req.session.avatar
+	} else {
+		return '/images/usersAvatars/placeholderAvatar.png'
+	}
+}
+
 router.use(session({
 	secret: secret,
 	store: store,
@@ -23,15 +31,17 @@ router.use(session({
 }));
 
 router.get('/', function(req, res) {
+	let connected = false;
 	if (req.session && req.session.user) {
-		res.redirect('/lobby');
+		connected = true;
 	}
-    res.render('index', { profil: routMod.getUserName(req), title: 'index', message: routMod.getUserName(req)});
+    res.render('index', { profil: routMod.getUserName(req), title: 'index', message: routMod.getUserName(req), avatar: getAvatar(req), connected: connected});
 });
 
 // Autres routes
 router.use("/login", require("./login"));
 router.use("/register", require("./register"));
+router.use("/disconnect", require("./disconnect"));
 router.use("/lobby", require("./lobby"));
 router.use("/profil", require("./profil"));
 router.use("/profil/:profilName", require("./profil"));

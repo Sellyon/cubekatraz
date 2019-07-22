@@ -153,6 +153,45 @@ exports.copyObject = function (original) {
   return copy;
 }
 
+const setUpInstance = function (instancesList, avatarSlot1, avatarSlot2) {
+  let newInstance = {
+    player1Id: avatarSlot1.status,
+    player1Name: avatarSlot1.name,
+    player1Image: avatarSlot1.image,
+    player1Opacity: 1,
+    player1isDead: false,
+    player1Disconnected: false,
+    player1Avatar: exports.getCubeAvatar(avatarSlot1.image),
+    player1Score: 0,
+    player1Deaths: 0,
+    player2Id: avatarSlot2.status,
+    player2Name: avatarSlot2.name,
+    player2Image: avatarSlot2.image,
+    player2Opacity: 1,
+    player2isDead: false,
+    player2Disconnected: false,
+    disconnectionTimer: 750, // 750*40 = 30 000 ms
+    player2Avatar: exports.getCubeAvatar(avatarSlot2.image),
+    player2Score: 0,
+    player2Deaths: 0,
+    level: 1,
+    elapsedTime: 0,
+    active: true,
+    victory: false,
+    checkpoint: {}
+  };
+  // Here we check if an instance is finished, if then, we take the slot for a new instance
+  for (var i = 0; i < instancesList.length; i++) {
+    if (!instancesList[i].active) {
+      instancesList.splice(i, 1, newInstance);
+      return i
+    }
+  }
+  // If there is no instance to replace, we take a new slot at the end of the list
+  instancesList.push(newInstance);
+  return (instancesList.length - 1)
+}
+
 exports.initiateEvasionCountDown = function (serverSocketIO, countDownStarted, countDownForbidden, instancesList, avatarSlot1, avatarSlot2) {
   if (!countDownStarted) {
     let countDownValue = 125; // 125*40(intervals in ms) = 5 seconds
@@ -167,42 +206,19 @@ exports.initiateEvasionCountDown = function (serverSocketIO, countDownStarted, c
         countDownForbidden = false;
         countDownStarted = false;
         if (countDownValue <= 0) {
-          instancesList.push({
-            player1Id: avatarSlot1.status,
-            player1Name: avatarSlot1.name,
-            player1Image: avatarSlot1.image,
-            player1Opacity: 1,
-            player1isDead: false,
-            player1Disconnected: false,
-            player1Avatar: exports.getCubeAvatar(avatarSlot1.image),
-            player1Score: 0,
-            player2Id: avatarSlot2.status,
-            player2Name: avatarSlot2.name,
-            player2Image: avatarSlot2.image,
-            player2Opacity: 1,
-            player2isDead: false,
-            player2Disconnected: false,
-            disconnectionTimer: 750, // 750*40 = 30 000 ms
-            player2Avatar: exports.getCubeAvatar(avatarSlot2.image),
-            player2Score: 0,
-            level: 1,
-            elapsedTime: 0,
-            active: true,
-            victory: false,
-            checkpoint: {}
-          });
+          let instanceIndex = setUpInstance(instancesList, avatarSlot1, avatarSlot2);
           // Settings for created instance
-          instancesList[instancesList.length - 1].rules = gameMod.instanceGenerator(serverSocketIO, instancesList.length - 1, instancesList);
-          instancesList[instancesList.length - 1].checkpoint.rules = exports.copyObject(instancesList[instancesList.length - 1].rules);
-          instancesList[instancesList.length - 1].checkpoint.player1Score = instancesList[instancesList.length - 1].player1Score;
-          instancesList[instancesList.length - 1].checkpoint.player2Score = instancesList[instancesList.length - 1].player2Score;
-          var destination = '/game/' + instancesList.length;
+          instancesList[instanceIndex].rules = gameMod.instanceGenerator(serverSocketIO, instanceIndex, instancesList);
+          instancesList[instanceIndex].checkpoint.rules = exports.copyObject(instancesList[instanceIndex].rules);
+          instancesList[instanceIndex].checkpoint.player1Score = instancesList[instanceIndex].player1Score;
+          instancesList[instanceIndex].checkpoint.player2Score = instancesList[instanceIndex].player2Score;
+          var destination = '/game/' + (instanceIndex + 1);
           serverSocketIO.emit('redirectToGameInstance', {
             url: destination,
             player1: avatarSlot1.name,
             player2: avatarSlot2.name
           });
-          console.log('instance creation : ' + instancesList.length);
+          console.log('instance creation : ' + (instanceIndex + 1));
         }
       } else {
         serverSocketIO.emit('updateEvasionCountDownBack', countDownText);

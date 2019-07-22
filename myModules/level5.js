@@ -404,5 +404,5 @@ exports.rules = {
   ],
   instanceCounter: 0,
   levelColor: '#C1C4D9',
-  levelTitle: 'Niveau 5 : Les cuisines'
+  levelTitle: 'Les cuisines'
 }

@@ -125,5 +125,5 @@ exports.rules = {
   ],
   instanceCounter: 0,
   levelColor: '#D9D1D7',
-  levelTitle: 'Niveau 2 : le corridor'
+  levelTitle: 'Le corridor'
 }

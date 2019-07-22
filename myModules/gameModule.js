@@ -71,6 +71,11 @@ const playerDeath = function (instance, i) {
         instance.player1isDead = false;
         instance.player2isDead = false;
         clearThisInterval();
+        if (i === 0) {
+          instance.player1Deaths += 1;
+        } else {
+          instance.player2Deaths += 1;
+        }
       } else {
         if (i === 0) {
           instance.player1Opacity -= 0.04;
@@ -301,21 +306,25 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
       // Activated doors moves
       for (var i = 0; i < walls.length; i++) {
         if (walls[i].isDoor && walls[i].isDoor.activated) {
+          let speed = 1;
+          if (walls[i].isDoor.speed) {
+            speed = walls[i].isDoor.speed;
+          }
           if (walls[i].isDoor.horizMaxPot !== 0 && walls[i].isDoor.horizMaxPot > 0) {
-            walls[i].isDoor.xGauge --;
-            walls[i].x --;
+            walls[i].isDoor.xGauge -= speed;
+            walls[i].x -= speed;
           };
           if (walls[i].isDoor.horizMaxPot !== 0 && walls[i].isDoor.horizMaxPot < 0) {
-            walls[i].isDoor.xGauge ++;
-            walls[i].x ++;
+            walls[i].isDoor.xGauge += speed;
+            walls[i].x += speed;
           };
           if (walls[i].isDoor.vertMaxPot !== 0 && walls[i].isDoor.vertMaxPot > 0) {
-            walls[i].isDoor.yGauge --;
-            walls[i].y --;
+            walls[i].isDoor.yGauge -= speed;
+            walls[i].y -= speed;
           };
           if (walls[i].isDoor.vertMaxPot !== 0 && walls[i].isDoor.vertMaxPot < 0) {
-            walls[i].isDoor.yGauge ++;
-            walls[i].y ++;
+            walls[i].isDoor.yGauge += speed;
+            walls[i].y += speed;
           };
           if (walls[i].isDoor.xGauge === 0 && walls[i].isDoor.yGauge === 0) {
             walls[i].isDoor.activated = false;

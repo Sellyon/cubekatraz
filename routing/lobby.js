@@ -6,6 +6,14 @@ const uri = "mongodb+srv://yoannmroz:Ech1ariandre@cluster0-bznsv.mongodb.net/tes
 const secret = '123456789SECRET';
 var router = express.Router();
 
+const getAvatar = function (req) {
+  if (req.session && req.session.avatar) {
+    return '/images/usersAvatars/' + req.session.avatar
+  } else {
+    return '/images/usersAvatars/placeholderAvatar.png'
+  }
+}
+
 const store = new MongoDBStore({
 	uri: uri,
 	databaseName: 'twoPrisoners',
@@ -23,7 +31,7 @@ router.use(session({
 }));
 
 router.get('/', [routMod.requireLogin], function(req, res) {
-    res.render('lobby', { profil: routMod.getUserName(req), title: 'index', message: routMod.getUserName(req)});
+  res.render('lobby', { profil: routMod.getUserName(req), title: 'Salle d\'attente', message: routMod.getUserName(req), avatar: getAvatar(req), connected:true});
 })
 
 module.exports = router;

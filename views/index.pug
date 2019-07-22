@@ -1,4 +1,12 @@
 html
+  script.
+    'use strict';
+    window.document.addEventListener('DOMContentLoaded', function () {
+      var indexButton = document.getElementById('indexButton');
+      indexButton.addEventListener('click', function (evt) {
+        window.location.href = '/lobby';
+      });
+    });
   head
     include includes/head.pug
   body
@@ -12,5 +20,4 @@ html
         | Cubekatraz est un jeu de coopération online qui met deux joueurs dans la peau de deux cubes intrépides bien décidés à s'échapper de la plus impitoyable des prisons qui soit : Cubekatraz !
       p
         | Saurez-vous en sortir indemne ?
-      button#indexButton(name='button')
-        a(href='/lobby') JOUER
+      button#indexButton(name='button') JOUER

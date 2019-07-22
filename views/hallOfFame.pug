@@ -9,23 +9,27 @@ html
 
       p
         | Ici est entretenue la mémoire des héros qui ont marqué l'histoire de Cubekatraz.
-      h2
-        | Les meilleurs duos
-      each duo , index in data
+      div#hOFCaption
+        p#hOFElement
+          | Joueur 1
+        p#hOFElement
+          | Joueur 2
+        p#hOFElement
+          | Score du groupe
+        p#hOFElement
+          | Victoire du groupe
+        p#hOFElement
+          | Temps écoulé
+        p#hOFElement
+          | Date
+      div#hoFMatchScreen
+        each duo , index in data
           div#oneHOFMatch
-            p
-              | Joueur 1 : 
+            p#hOFElement
               a(href='/profil/' + duo.player1)= duo.player1
-            p
-              | Joueur 2 : 
+            p#hOFElement
               a(href='/profil/' + duo.player2)= duo.player2
-            p
-              | Score du groupe : 
-              span= duo.score
-            p
-              | Victoire du groupe : 
-              span= duo.victory
-            p
-              | Temps écoulé : 
-              span= duo.time
-            p= "Partie faite le " + duo.date
+            p#hOFElement=duo.score
+            p#hOFElement=duo.victory
+            p#hOFElement=duo.time
+            p#hOFElement=duo.date

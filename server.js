@@ -136,6 +136,7 @@ serverSocketIO.on('connection', function (socket) {
 				});
 			});
 	        serverSocketIO.emit('chatTextDispatched', data);
+	        client.close();
 		});
 		
 		// Disconnection management

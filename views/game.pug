@@ -4,20 +4,19 @@ html
 		link(rel='stylesheet', type='text/css', href='/css/game.css')
 		script(src='/socket.io/socket.io.js')
 	body
-		h1#levelTitle
-			| Level 1
 		script(type='text/javascript', src='/js/game.js')
+		div#disconnectionIssues
+			p#disconnectionText
 		div#infosInGame
+			h2#levelNumber
+			p#levelTitle
 			h2#player1NameInGame
-			span#player1ScoreInGame
+			p#player1ScoreInGame
+			p#player1DeathsInGame
 			h2#player2NameInGame
-			span#player2ScoreInGame
-			h2
-				| Temps écoulé : 
-			span#elapsedTimeInGame
+			p#player2ScoreInGame
+			p#player2DeathsInGame
+			h2#elapsedTimeInGame
 		div#canvasAndButton
 			canvas#canvas Votre navigateur ne supporte pas HTML5, veuillez le mettre &agrave; jour pour jouer.
 			button#victoryButton(name='button') HOURRA !
-		div#disconnectionIssues
-			p#disconnectionText
-				| Ici sont indiqués les joueurs déconnectés
