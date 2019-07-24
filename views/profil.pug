@@ -2,30 +2,41 @@ html
   include includes/head.pug
   body
     include includes/navigation.pug
-    block content
-    h1= titleprofil
-    h2
-      | Présentation
-    img(src=avatarProfil)
-    p= description
-    h2
-      | Statistiques
-    p
-      | Meilleur score : 
-      a= bestScore
-      br
-      | Nombre de parties : 
-      a= matchPlayed
-      br
-      | Nombre de victoires : 
-      a= gameFinished
-      br
-      | Meilleur temps : 
-      a= bestTime
-    h2
-      | Amis :
-    ul
-      each friend , index in friends
-        li
-          a(href='/profil/' + friend)= friend
-    block options
+    div#profilWrapper
+      h1= titleprofil
+      img(src=avatarProfil)
+      input#editAvatar(type='image', src='/images/icons/edit.svg', class='edit')
+      div#profilDetails
+        div#ProfilPresentation
+          h2
+            | Présentation
+          p= description
+          form#descriptionForm(action='/test', method='post')
+            div
+              input#msg(name='message', minlength='1', style='width:80%')
+              input(type='submit', value='envoyer')
+              input(type='submit', value='annuler')
+          input#editDescription(type='image', src='/images/icons/edit.svg', class='edit')
+        div#ProfilStats
+          h2
+            | Statistiques
+          p
+            | Meilleur score : 
+            a= bestScore
+            br
+            | Nombre de parties : 
+            a= matchPlayed
+            br
+            | Nombre de victoires : 
+            a= gameFinished
+            br
+            | Meilleur temps : 
+            a= bestTime
+        div#ProfilFriends
+          h2
+            | Amis :
+          ul
+            each friend , index in friends
+              li
+                a(href='/profil/' + friend)= friend
+  include includes/footer.pug

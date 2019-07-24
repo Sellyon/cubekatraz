@@ -11,7 +11,7 @@ html
     include includes/head.pug
   body
     include includes/navigation.pug
-    div#main
+    div#main.indexPitch
       h1#welcomingMsg
         | Bienvenue 
         a= message
@@ -21,3 +21,4 @@ html
       p
         | Saurez-vous en sortir indemne ?
       button#indexButton(name='button') JOUER
+  include includes/footer.pug
