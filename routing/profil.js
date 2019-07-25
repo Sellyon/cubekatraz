@@ -40,6 +40,7 @@ router.get('/', [routMod.requireLogin], function (req, res) {
 });
 
 router.get('/:profilName', function (req, res) {
+	console.log(req.params.profilName);
 	connected = false;
 	if (req.session && req.session.user) {
 		connected = true
@@ -76,5 +77,51 @@ router.get('/:profilName', function (req, res) {
 		});
 	});
 });
+
+router.post('/:profilName', function(req, res) {
+	connected = false;
+	if (req.session && req.session.user) {
+		connected = true
+	}
+
+	client.connect(uri, function () {
+		myDB = client.get().db('twoPrisoners');
+		let collection = myDB.collection('users');
+
+		// If a request to modify description is done AND the user in session is the owner of the profile the request is accepted
+		if (req.params.profilName === routMod.getUserName(req) && req.body.editDescription) {
+			collection.update(
+				{name: req.params.profilName},
+				{ $set: { description: req.body.editDescription } },
+			)
+		}
+		collection.find({name: req.params.profilName}).toArray(function(err, data){
+		  if (err) throw err;
+		  if (data[0] !== undefined){
+		  	if (routMod.getUserName(req) === data[0].name) {
+		  		var titleprofil = 'Votre profil';
+		  	} else {
+		  		var titleprofil = 'Profil de ' + req.params.profilName;
+		  	}
+			res.render('profil', { 
+				profil: routMod.getUserName(req), title: 'profil ' + req.params.profilName,
+				titleprofil: titleprofil,
+				description: data[0].description,
+				bestScore: data[0].bestScore,
+				matchPlayed: data[0].matchPlayed,
+				gameFinished: data[0].gameFinished,
+				bestTime: data[0].bestTime,
+				friends: data[0].friends,
+				avatarProfil: '/images/usersAvatars/' + data[0].avatar,
+				avatar: getAvatar(req),
+				connected: connected
+			});
+		  } else {
+		  	res.redirect('/unknowned');
+		  }
+		  client.close();
+		});
+	});
+})
 
 module.exports = router;

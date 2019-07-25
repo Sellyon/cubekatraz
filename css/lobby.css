@@ -73,6 +73,7 @@ button{
 button:hover{
 	color: #5C302A;
 	background-color: bisque;
+	transition: all 0.3s ease-out;
 }
 
 #navigation{
@@ -364,18 +365,33 @@ button:hover{
 #profilWrapper{
 	margin-top: 20px;
     margin-bottom: 20px;
+    margin-left: auto;
+	margin-right: auto;
+    text-align: left;
+    width: 90%;
 }
 #profilWrapper > h1{
     margin-bottom: 10px;
 }
+#profilAvatar{
+	width: 40%;
+	box-sizing: border-box;
+}
 #profilDetails{
+    width: 55%;
 	display: inline-block;
 	vertical-align: top;
 	margin-left: 25px;
+	margin-top: 32px;
 }
 #profilDetails > *{
 	margin-bottom: 15px;
 	text-align: left;
+	background-color: #f2e5c6;
+	box-sizing: border-box;
+}
+#profilPresentation{
+	height: 200px;
 }
 #profilFriends > ul{
 	list-style: none;
@@ -389,6 +405,26 @@ button:hover{
 }
 .edit:hover{
 	background-color: rgba(179,123,64,1);
+}
+#descriptionForm{
+	display: none;
+}
+#editDescription{
+	width: 100%;
+}
+#descriptionForm > div > button{
+	width: 50%;
+	font-size: 16px;
+	height: 40px;
+}
+#cancelEditDescription{
+	display: none;
+}
+#iconEditAvatar{
+	position: relative;
+	display: block;
+	top: -40px;
+	left: 3px;
 }
 /* FOOTER */
 
@@ -404,7 +440,7 @@ footer h1 {
     font-family: 'Crete Round', serif;
     font-size: 45px;
     text-decoration: none;
-    transition: all 0.5s ease-out;
+    transition: all 0.3s ease-out;
 }
 footer h1:hover {
     color: #a70db2;

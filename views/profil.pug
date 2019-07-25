@@ -1,22 +1,26 @@
 html
   include includes/head.pug
   body
+    script(type='text/javascript', src='/js/profil.js')
     include includes/navigation.pug
     div#profilWrapper
-      h1= titleprofil
-      img(src=avatarProfil)
-      input#editAvatar(type='image', src='/images/icons/edit.svg', class='edit')
+      div#profilAvatar
+        h1= titleprofil
+        img(src=avatarProfil)
+        input#IconEditAvatar(type='image', src='/images/icons/edit.svg', class='edit', title='modifier votre avatar')
       div#profilDetails
         div#ProfilPresentation
           h2
             | Présentation
-          p= description
-          form#descriptionForm(action='/test', method='post')
+          p#description= description
+          form#descriptionForm(action='/profil/' + profil, method='post')
             div
-              input#msg(name='message', minlength='1', style='width:80%')
-              input(type='submit', value='envoyer')
-              input(type='submit', value='annuler')
-          input#editDescription(type='image', src='/images/icons/edit.svg', class='edit')
+              textarea#editDescription(name='editDescription', minlength='1', rows='2' cols='20' wrap='hard', height='80px')
+              button(type='submit', value='envoyer') envoyer
+              button#cancelEditDescription(name='button') annuler
+          input#iconEditDescription(type='image', src='/images/icons/edit.svg', class='edit', title='éditer votre description')
+          
+
         div#ProfilStats
           h2
             | Statistiques
