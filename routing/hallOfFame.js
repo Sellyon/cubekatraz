@@ -43,19 +43,21 @@ router.get('/', function (req, res) {
 	client.connect(uri, function () {
 		myDB = client.get().db('twoPrisoners');
 		let collection = myDB.collection('matchs');
-		collection.find().sort({score: -1}).toArray(function(err, data){
-			for (let i = 0; i < data.length; i++) {
-				data[i].time = routMod.msToTime(data[i].time);
-				data[i].date = routMod.convertDateNowToEuropeanDate(data[i].date);
-				data[i].victory = routMod.getVictoryMessage(data[i].victory);
+		collection.find().sort({score: -1, time: 1}).toArray(function(err, data){
+			if (data) {
+				for (let i = 0; i < data.length; i++) {
+					data[i].time = routMod.msToTime(data[i].time);
+					data[i].date = routMod.convertDateNowToEuropeanDate(data[i].date);
+					data[i].victory = routMod.getVictoryMessage(data[i].victory);
+				}
+				res.render('hallOfFame', { 
+					profil: routMod.getUserName(req),
+					title: 'Panthéon',
+					data: data,
+					avatar: getAvatar(req),
+					connected: connected
+				});
 			}
-			res.render('hallOfFame', { 
-				profil: routMod.getUserName(req),
-				title: 'Panthéon',
-				data: data,
-				avatar: getAvatar(req),
-				connected: connected
-			});
 			client.close();
 		});
 	});

@@ -23,7 +23,7 @@ const testCollisions = function (obj1, obj2, vecteurX, vecteurY) {
   let vectorXFinal = vecteurX;
   let vectoryFinal = vecteurY;
 
-  // compraisons between hitbox player and other hitbox
+  // comparisons between hitbox player and other hitbox
   if (
     obj1.y + obj1.height + vecteurY > obj2.y
   && obj1.y + vecteurY < obj2.y + obj2.height
@@ -375,12 +375,63 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
         date:Date.now()
       }
       client.connect(uri, function () {
-      myDB = client.get().db('twoPrisoners');
-      let collection = myDB.collection('matchs');
+        myDB = client.get().db('twoPrisoners');
+        let collection = myDB.collection('matchs');
         myDB.collection('matchs').insertOne(newMatch, function(err, insertRes) {
           if (err) throw err;
           console.log("1 match inserted");
-          client.close();
+        });
+        collection = myDB.collection('users');
+        collection.find({name: instance.player1Name}).toArray(function(err, data){
+          if (err) throw err;
+          if (data[0] !== undefined){
+            if (instance.player1Score > data[0].bestScore) {
+              collection.update(
+                {name: instance.player1Name},
+                { $set: { bestScore: instance.player1Score } },
+              )
+            }
+            collection.update(
+              {name: instance.player1Name},
+              { $set: { matchPlayed: data[0].matchPlayed+1 } },
+            )
+            collection.update(
+              {name: instance.player1Name},
+              { $set: { gameFinished: data[0].gameFinished+1 } },
+            )
+            if (instance.elapsedTime < data[0].bestTime || data[0].bestTime === 0) {
+              collection.update(
+                {name: instance.player1Name},
+                { $set: { bestTime: instance.elapsedTime } },
+              )
+            }
+          }
+        });
+        collection.find({name: instance.player2Name}).toArray(function(err, data){
+          if (err) throw err;
+          if (data[0] !== undefined){
+            if (instance.player2Score > data[0].bestScore) {
+              collection.update(
+                {name: instance.player2Name},
+                { $set: { bestScore: instance.player2Score } },
+              )
+            }
+            collection.updateOne(
+              {name: instance.player2Name},
+              { $set: { matchPlayed: data[0].matchPlayed+1 } },
+            )
+            collection.updateOne(
+              {name: instance.player2Name},
+              { $set: { gameFinished: data[0].gameFinished+1 } },
+            )
+            if (instance.elapsedTime < data[0].bestTime || data[0].bestTime === 0) {
+              collection.updateOne(
+                {name: instance.player2Name},
+                { $set: { bestTime: instance.elapsedTime } },
+              )
+            }
+            //client.close();
+          }
         });
       });
     }

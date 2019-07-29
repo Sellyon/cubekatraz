@@ -1,46 +1,52 @@
 html
   include includes/head.pug
   body
+    script.
+      var profil = '!{profil}';
     script(type='text/javascript', src='/js/profil.js')
     include includes/navigation.pug
-    div#profilWrapper
-      div#profilAvatar
-        h1= titleprofil
-        img(src=avatarProfil)
-        input#IconEditAvatar(type='image', src='/images/icons/edit.svg', class='edit', title='modifier votre avatar')
-      div#profilDetails
-        div#ProfilPresentation
-          h2
-            | Présentation
-          p#description= description
-          form#descriptionForm(action='/profil/' + profil, method='post')
-            div
-              textarea#editDescription(name='editDescription', minlength='1', rows='2' cols='20' wrap='hard', height='80px')
-              button(type='submit', value='envoyer') envoyer
-              button#cancelEditDescription(name='button') annuler
-          input#iconEditDescription(type='image', src='/images/icons/edit.svg', class='edit', title='éditer votre description')
-          
+    div#profilBackGround
+      div#profilWrapper
+        div#profilAvatar
+          h1= titleprofil
+          img(src=avatarProfil)
+          input#iconEditAvatar(type='image', src='/images/icons/edit.svg', class='edit', title='modifier votre avatar')
+        div#profilDetails
+          div#profilPresentation
+            img#iconTrombone(src='/images/icons/trombone.png')
+            h2
+              | Dossier pénitentiaire
+            p#description= description
+            form#descriptionForm(action='/profil/' + profil, method='post')
+              div
+                textarea#editDescription(name='editDescription', maxlength='380', rows='8' cols='20' wrap='hard', height='130px')
+                button(type='submit', value='envoyer') envoyer
+                button#cancelEditDescription(name='button') annuler
+            input#iconEditDescription(type='image', src='/images/icons/edit.svg', class='edit', title='éditer votre description')
 
-        div#ProfilStats
-          h2
-            | Statistiques
-          p
-            | Meilleur score : 
-            a= bestScore
-            br
-            | Nombre de parties : 
-            a= matchPlayed
-            br
-            | Nombre de victoires : 
-            a= gameFinished
-            br
-            | Meilleur temps : 
-            a= bestTime
-        div#ProfilFriends
-          h2
-            | Amis :
-          ul
-            each friend , index in friends
-              li
-                a(href='/profil/' + friend)= friend
+          div#statsAndFriends
+            div#profilStats
+              h2
+                | Observations
+              div#statsIcons
+                div
+                  img(src='/images/icons/score.png', title='meilleur score')
+                div
+                  img(src='/images/icons/coop.png', title='parties effectuées')
+                div
+                  img(src='/images/icons/victories.png', title='parties victorieuses')
+                div
+                  img(src='/images/icons/chrono.png', title='meilleur chrono')
+              div#statsValues
+                p= bestScore
+                p= matchPlayed
+                p= gameFinished
+                p= bestTime
+            div#ProfilFriends
+              h2
+                | Amis :
+              ul
+                each friend , index in friends
+                  li
+                    a(href='/profil/' + friend)= friend
   include includes/footer.pug

@@ -40,7 +40,6 @@ router.get('/', [routMod.requireLogin], function (req, res) {
 });
 
 router.get('/:profilName', function (req, res) {
-	console.log(req.params.profilName);
 	connected = false;
 	if (req.session && req.session.user) {
 		connected = true
@@ -53,9 +52,9 @@ router.get('/:profilName', function (req, res) {
 		  if (err) throw err;
 		  if (data[0] !== undefined){
 		  	if (routMod.getUserName(req) === data[0].name) {
-		  		var titleprofil = 'Votre profil';
+		  		var titleprofil = 'Votre matricule';
 		  	} else {
-		  		var titleprofil = 'Profil de ' + req.params.profilName;
+		  		var titleprofil = 'Matricule de ' + req.params.profilName;
 		  	}
 			res.render('profil', { 
 				profil: routMod.getUserName(req), title: 'profil ' + req.params.profilName,
@@ -64,7 +63,7 @@ router.get('/:profilName', function (req, res) {
 				bestScore: data[0].bestScore,
 				matchPlayed: data[0].matchPlayed,
 				gameFinished: data[0].gameFinished,
-				bestTime: data[0].bestTime,
+				bestTime: routMod.msToTime(data[0].bestTime*40),
 				friends: data[0].friends,
 				avatarProfil: '/images/usersAvatars/' + data[0].avatar,
 				avatar: getAvatar(req),
@@ -99,9 +98,9 @@ router.post('/:profilName', function(req, res) {
 		  if (err) throw err;
 		  if (data[0] !== undefined){
 		  	if (routMod.getUserName(req) === data[0].name) {
-		  		var titleprofil = 'Votre profil';
+		  		var titleprofil = 'Votre matricule';
 		  	} else {
-		  		var titleprofil = 'Profil de ' + req.params.profilName;
+		  		var titleprofil = 'Matricule de ' + req.params.profilName;
 		  	}
 			res.render('profil', { 
 				profil: routMod.getUserName(req), title: 'profil ' + req.params.profilName,
@@ -110,7 +109,7 @@ router.post('/:profilName', function(req, res) {
 				bestScore: data[0].bestScore,
 				matchPlayed: data[0].matchPlayed,
 				gameFinished: data[0].gameFinished,
-				bestTime: data[0].bestTime,
+				bestTime: routMod.msToTime(data[0].bestTime*40),
 				friends: data[0].friends,
 				avatarProfil: '/images/usersAvatars/' + data[0].avatar,
 				avatar: getAvatar(req),
