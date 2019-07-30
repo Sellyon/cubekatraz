@@ -386,6 +386,7 @@ button:hover{
 #profilStats{
 	box-sizing: border-box;
 	display: inline-block;
+	padding-right: 10px;
 	width: 50%;
 	border-right: 1px solid black;
 }
@@ -431,6 +432,9 @@ button:hover{
 }
 #profilFriends > ul{
 	list-style: none;
+}
+#statsIcons{
+	margin-bottom: 5px;
 }
 #statsIcons > div{
 	width: 25%;
