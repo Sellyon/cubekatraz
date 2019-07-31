@@ -42,7 +42,7 @@ A database named "cubekatraz" exist in Mongo Atlas, containing 3 collections : s
 
 7- The lobby
 
-I needed a whole page to make players confy before a match, so I created the lobby. I was inspired by the Twitch HUD, so I made a chat to allow player to communicate between them before a match. In the lobby you can see every connected player in the lobby, check their profiles, and see every instances currently played, and join them as a viewer. The lobby contain a system to create duos : simply 2 slots that players can fills by clicking "join party" button. When 2 players joins a party, the match start after a 5s countdown.
+I needed a whole page to make players comfy before a match, so I created the lobby. I was inspired by the Twitch HUD, so I made a chat to allow player to communicate between them before a match. In the lobby you can see every connected player in the lobby, check their profiles, and see every instances currently played, and join them as a viewer. The lobby contain a system to create duos : simply 2 slots that players can fills by clicking "join party" button. When 2 players joins a party, the match start after a 5s countdown.
 
 
 8- An action/puzzle game
