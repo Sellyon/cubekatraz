@@ -37,7 +37,7 @@ While a team is playing, viewers can joins the game as spectators, and enjoys th
 
 6- Stats and Data Bases
 
-A databse named "cubekatraz" exist in Mongo Atlas, containing 3 collections : sessions, users, and matchs. Sessions is used to store users sessions, users contains severals informations on users (description, avatar's image, best score, best time, number of match played, best chrono, and a list of friends), match contain all successful match played in the game, with related informations (players in the match, total score, elapsed time, date, victory match).
+A database named "cubekatraz" exist in Mongo Atlas, containing 3 collections : sessions, users, and matchs. Sessions is used to store users sessions, users contains severals informations on users (description, avatar's image, best score, best time, number of match played, best chrono, and a list of friends), match contain all successful match played in the game, with related informations (players in the match, total score, elapsed time, date, victory match).
 
 
 7- The lobby
@@ -53,3 +53,12 @@ The game is a websocketed real time online game. The game is a serie of levels, 
 9- Enjoy !
 
 This game is designed to be fun and done quickly, around 5mn for a match. Just try not to be angry on your friend if he sucks.
+
+# Technos
+FRONT
+
+HTML, CSS, PUG, vanilla Javascript.
+
+BACK
+
+Express JS, MongoDB
