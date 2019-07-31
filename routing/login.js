@@ -82,8 +82,12 @@ router.post('/', function(req, res) {
 			  } else {
 			  	message = 'Cet utilisateur n\'est pas enregistré.';
 			  }
-				res.render('login', { profil: getUserName(req), title: 'login', message: message, avatar: getAvatar(req), connected: connected});
 				client.close();
+				if (connected) {
+					res.redirect('/lobby');
+				} else {
+					res.render('login', { profil: getUserName(req), title: 'login', message: message, avatar: getAvatar(req), connected: connected});
+				}
 			});
 		});
 	}
