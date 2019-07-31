@@ -27,7 +27,7 @@ p {
 nav{
 	width : 100%;
 	margin : 0 auto;
-	height: 2rem;
+	height: 38px;
 	text-align: left;
 	border-bottom : 1px solid #EEE2B2;
 	background-color: #906e40;
@@ -130,11 +130,13 @@ button:hover{
 
 /**** Lobby ****/
 
+#lobbyContainer > *{
+	height: calc(100vh - 198px);
+}
 #lobbySideLeft{
 	width: 15%;
 	display: inline-block;
 	box-sizing: border-box;
-	height: 475px;
 	border-right: 1px solid #EEE2B2;
 	background-color: #3e2e1c;
 	color: #f6d8b2;
@@ -160,7 +162,6 @@ button:hover{
 
 #lobbyAntichamber {
 	width: 60%;
-	height: 475px;
 	display: inline-block;
 	box-sizing: border-box;
 	vertical-align: top;
@@ -173,7 +174,6 @@ button:hover{
 
 #lobbyChat {
 	width: 25%;
-	height: 475px;
 	display: inline-block;
 	box-sizing: border-box;
 	vertical-align: top;

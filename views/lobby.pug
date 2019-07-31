@@ -273,54 +273,55 @@ html
     });
   body
     include includes/navigation.pug
-    div#lobbySideLeft
-      div#lobbyConnectedPlayers
-        div#lobbyConnectedPlayersTexts
-          h2
-            | Prisonniers connectés
-          //- p
-          //-   | En un clin d'oeil vous repérez dans le coin quelques personnes susceptibles de tenter une évasion avec vous.
-        div#connectedPlayers
-          span#connectedChild
-      div#lobbyCurrentMatches
-        div#lobbyCurrentMatchesTexts
-          h2
-            | Evasions en cours
-          //- p
-          //-   | Vous pouvez observer d'ici les braves risquant leur peau pour s'échapper
-        div#currentMatches
-          span#matchChild
-    div#lobbyAntichamber
-      h2
-        | Salle d'attente
-      p
-        | Lorsque deux prisonniers sont dans la salle d'attente ils peuvent tenter une évasion.
-      button#AntichamberAdder(name='button') Rejoindre partie
-      div#slotPlayers
-        div#slotPlayer1
-          p
-            | joueur 1 : 
-            a#player1InAntichamber
-          button#player1AvatarSelect(name='button') >
-          img#avatarPlayer1(src='', alt='player 1 portrait' width=200 height= 200)
-        p#evasionCountDown
-        div#slotPlayer2
-          p
-            | joueur 2 : 
-            a#player2InAntichamber
-          button#player2AvatarSelect(name='button') >
-          img#avatarPlayer2(src='', alt='player 2 portrait' width=200 height= 200)
-        p#antichamberStatus
-    div#lobbyChat
-      h2
-        | Le réfectoire
-      //- p
-      //-   | C'est ici que les prisonniers profitent du déjeuner en compagnie des autres pour s'échanger des informations et organiser leurs fuites.
-      div#chatBox
-        span#chatChild
-      form#tchatForm(action='/test', method='post')
-        div
-          label(for='msg') Message :
-          input#msg(name='message', minlength='1', style='width:80%')
-          input(type='submit', value='envoyer')
+    div#lobbyContainer
+      div#lobbySideLeft
+        div#lobbyConnectedPlayers
+          div#lobbyConnectedPlayersTexts
+            h2
+              | Prisonniers connectés
+            //- p
+            //-   | En un clin d'oeil vous repérez dans le coin quelques personnes susceptibles de tenter une évasion avec vous.
+          div#connectedPlayers
+            span#connectedChild
+        div#lobbyCurrentMatches
+          div#lobbyCurrentMatchesTexts
+            h2
+              | Evasions en cours
+            //- p
+            //-   | Vous pouvez observer d'ici les braves risquant leur peau pour s'échapper
+          div#currentMatches
+            span#matchChild
+      div#lobbyAntichamber
+        h2
+          | Salle d'attente
+        p
+          | Lorsque deux prisonniers sont dans la salle d'attente ils peuvent tenter une évasion.
+        button#AntichamberAdder(name='button') Rejoindre partie
+        div#slotPlayers
+          div#slotPlayer1
+            p
+              | joueur 1 : 
+              a#player1InAntichamber
+            button#player1AvatarSelect(name='button') >
+            img#avatarPlayer1(src='', alt='player 1 portrait' width=200 height= 200)
+          p#evasionCountDown
+          div#slotPlayer2
+            p
+              | joueur 2 : 
+              a#player2InAntichamber
+            button#player2AvatarSelect(name='button') >
+            img#avatarPlayer2(src='', alt='player 2 portrait' width=200 height= 200)
+          p#antichamberStatus
+      div#lobbyChat
+        h2
+          | Le réfectoire
+        //- p
+        //-   | C'est ici que les prisonniers profitent du déjeuner en compagnie des autres pour s'échanger des informations et organiser leurs fuites.
+        div#chatBox
+          span#chatChild
+        form#tchatForm(action='/test', method='post')
+          div
+            label(for='msg') Message :
+            input#msg(name='message', minlength='1', style='width:80%')
+            input(type='submit', value='envoyer')
     include includes/footer.pug
