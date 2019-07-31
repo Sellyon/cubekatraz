@@ -15,7 +15,7 @@ html
             div#connectPasswordField
               label(for='password') Mot de passe :
               input#surname(type='password' name='user_password')
-            button(type='submit') Envoyer le message
+            button(type='submit') Connexion
         div#connectionForm
           h2 Créer profil
           form(action='/register' method='post')
@@ -25,7 +25,7 @@ html
             div#RegisterPasswordField
               label(for='password') Mot de passe :
               input#surname(type='password' name='user_password')
-            button(type='submit') Envoyer le message
+            button(type='submit') Inscription
       else
         form(action='/login', method='post')
           button(type='submit' name='user_disconnect' value='true') Se déconnecter

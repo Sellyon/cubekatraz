@@ -263,28 +263,24 @@ button:hover{
 	display: inline-block;
 }
 
-#avatarPlayer1{
+#avatarPlayer1, #avatarPlayer2{
 	border: 2px solid #5A5540;
+	width: 80%;
+	box-sizing: border-box;
+	height: auto;
 }
 
-#avatarPlayer2{
-	border: 2px solid #5A5540;
-}
-
-#player1AvatarSelect {
+#player1AvatarSelect, #player2AvatarSelect {
 	visibility: hidden;
-	width: 50;
-    height: 50;
+	width: 20%;
+	height: auto;
     font-size: 40;
     vertical-align: bottom;
+    box-sizing: border-box;
 }
 
-#player2AvatarSelect {
-	visibility: hidden;
-	width: 50;
-    height: 50;
-    font-size: 40;
-    vertical-align: bottom;
+#antichamberStatus {
+	margin-top: 10px;
 }
 
 #evasionCountDown {
@@ -527,4 +523,38 @@ footer h1:hover {
 }
 .dot {
     color: #a70db2;
+}
+
+/*media queries*/
+
+/*navigation*/
+
+@media screen and (max-width: 920px) {
+	nav div ul li {
+    	width: 38%;
+	}
+}
+
+/*lobby*/
+
+@media screen and (min-width: 400px) and (max-width: 600px) {
+	#lobbySideLeft{
+		height: 200px;
+	}
+	#lobbyConnectedPlayers, #lobbyCurrentMatches {
+		width: 50%;
+		height: 100%;
+		display: inline-block;
+		box-sizing: border-box;
+	}
+	#lobbyConnectedPlayers {
+		border-right: 1px solid bisque;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	#lobbyContainer > * {
+		display: block;
+		width: 100%;
+	}
 }

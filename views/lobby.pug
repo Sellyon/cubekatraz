@@ -292,11 +292,12 @@ html
           div#currentMatches
             span#matchChild
       div#lobbyAntichamber
-        h2
-          | Salle d'attente
-        p
-          | Lorsque deux prisonniers sont dans la salle d'attente ils peuvent tenter une évasion.
-        button#AntichamberAdder(name='button') Rejoindre partie
+        div#antichamberHeader
+          h2
+            | Salle d'attente
+          p
+            | Lorsque deux prisonniers sont dans la salle d'attente ils peuvent tenter une évasion.
+          button#AntichamberAdder(name='button') Rejoindre partie
         div#slotPlayers
           div#slotPlayer1
             p
