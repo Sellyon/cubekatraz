@@ -2,7 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const routMod = require(__dirname + '/routerModules/routerModule.js');
 const MongoDBStore = require('connect-mongodb-session')(session);
-const uri = "mongodb+srv://yoannmroz:Ech1ariandre@cluster0-bznsv.mongodb.net/test?retryWrites=true&w=majority";
+const uri = "mongodb+srv://yoannmroz:ChristopheMonGodetBLOL@cluster0-bznsv.mongodb.net/test?retryWrites=true&w=majority";
 const secret = '123456789SECRET';
 var router = express.Router();
 

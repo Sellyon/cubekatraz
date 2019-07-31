@@ -17,7 +17,7 @@ const objectId = require('mongodb').ObjectID;
 const client = require(__dirname + '/dbs/db.js');
 const lobbyMod = require(__dirname + '/myModules/lobbyModule.js');
 const gameMod = require(__dirname + '/myModules/gameModule.js');
-const uri = "mongodb+srv://yoannmroz:ChristopheMonGodetBLOL@cluster0-bznsv.mongodb.net/test?retryWrites=true&w=majority";
+const uri = "mongodb+srv://yoannmroz:Ech1ariandre@cluster0-bznsv.mongodb.net/test?retryWrites=true&w=majority";
 var myDB;
 
 app.locals.basedir = path.join(__dirname, '/views/includes');
