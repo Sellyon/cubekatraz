@@ -37,12 +37,12 @@ While a team is playing, viewers can joins the game as spectators, and enjoys th
 
 6- Stats and Data Bases
 
-A databse named "cubekatraz" exist in Mongo Atlas, containing 3 collections : sessions, users, and matchs. Sessions is used to store users sessions, users contains severals informations on users (description, avatar's image, best score, best time, number of match played, best chrono, and a list of friends), match contain all successful match played in the game, with related informations (players in the match, total score, elapsed time, date, victory match).
+A database named "cubekatraz" exist in Mongo Atlas, containing 3 collections : sessions, users, and matchs. Sessions is used to store users sessions, users contains severals informations on users (description, avatar's image, best score, best time, number of match played, best chrono, and a list of friends), match contain all successful match played in the game, with related informations (players in the match, total score, elapsed time, date, victory match).
 
 
 7- The lobby
 
-I needed a whole page to make players confy before a match, so I created the lobby. I was inspired by the Twitch HUD, so I made a chat to allow player to communicate between them before a match. In the lobby you can see every connected player in the lobby, check their profiles, and see every instances currently played, and join them as a viewer. The lobby contain a system to create duos : simply 2 slots that players can fills by clicking "join party" button. When 2 players joins a party, the match start after a 5s countdown.
+I needed a whole page to make players comfy before a match, so I created the lobby. I was inspired by the Twitch HUD, so I made a chat to allow player to communicate between them before a match. In the lobby you can see every connected player in the lobby, check their profiles, and see every instances currently played, and join them as a viewer. The lobby contain a system to create duos : simply 2 slots that players can fills by clicking "join party" button. When 2 players joins a party, the match start after a 5s countdown.
 
 
 8- An action/puzzle game
@@ -53,3 +53,12 @@ The game is a websocketed real time online game. The game is a serie of levels, 
 9- Enjoy !
 
 This game is designed to be fun and done quickly, around 5mn for a match. Just try not to be angry on your friend if he sucks.
+
+# Technos
+FRONT
+
+HTML, CSS, PUG, vanilla Javascript.
+
+BACK
+
+Express JS, MongoDB
