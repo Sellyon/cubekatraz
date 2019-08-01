@@ -102,7 +102,7 @@ button:hover{
 #main{
 	width : 70%;
 	margin : 0 auto;
-	padding: 25;
+	padding: 25px;
 	text-align: center;
 }
 #main p{
@@ -110,7 +110,7 @@ button:hover{
 }
 
 .indexPitch{
-	width: 40%!important;
+	width: 80%!important;
 }
 
 #indexButton {
@@ -289,7 +289,9 @@ button:hover{
 	font-size: 10em;
 }
 
-#oneHOFMatch {
+/* Hall of fame */
+
+.oneHOFMatch {
 	box-sizing: border-box;
 	width: 90%;
 	margin: 5;
@@ -299,12 +301,33 @@ button:hover{
     list-style: none;
 }
 
-#hoFMatchScreen{
+.containerIconRank{
+	float: left;
+	overflow: hidden;
+	width: 38px;
+	height: 45px;
+}
+
+.containerIconRank > img {
+	width: 114px;
+	height: 45px;
+	position: relative;
+}
+
+.containerIconRank:nth-child(3) > img {
+	left: -38px;
+}
+
+.containerIconRank:nth-child(5) > img {
+	left: -76px;
+}
+
+#hoFMatchScreen {
 	height: 400px;
 	overflow: auto;
 }
 
-#oneHOFMatch:hover {
+.oneHOFMatch:hover {
 	padding: 6;
 	border: 5px solid #5C302A;
 }
@@ -315,10 +338,17 @@ button:hover{
 	color: #2D1916;
 }
 
-#hOFElement{
+.hOFElement{
 	display: inline-block;
 	text-align: center;
 	width: 12%;
+	padding: 10px;
+	margin: 0px!important;
+}
+
+.hOFElement > img {
+	width: 75%;
+	margin: auto;
 }
 
 #infosInGame {
@@ -412,7 +442,7 @@ button:hover{
 #profilPresentation > p{
 	overflow: auto;
 	position: relative;
-	left: -40px;
+	width: 100%;
 }
 #profilPresentation > h2{
 	position: relative;

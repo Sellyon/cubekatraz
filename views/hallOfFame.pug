@@ -10,27 +10,37 @@ html
       p
         | Ici est entretenue la mémoire des héros qui ont marqué l'histoire de Cubekatraz.
       div#hOFCaption
-        p#hOFElement
-          | Joueur 1
-        p#hOFElement
-          | Joueur 2
-        p#hOFElement
-          | Score du groupe
-        p#hOFElement
-          | Victoire du groupe
-        p#hOFElement
-          | Temps écoulé
-        p#hOFElement
-          | Date
+        div.hOFElement
+          img(src='/images/icons/player1.svg', title='joueur 1')
+        div.hOFElement
+          img(src='/images/icons/player2.svg', title='joueur 2')
+        div.hOFElement
+          img(src='/images/icons/score.png', title='score du groupe')
+        div.hOFElement
+          img(src='/images/icons/victories.png', title='victoire du groupe')
+        div.hOFElement
+          img(src='/images/icons/chrono.png', title='temps de la partie')
+        div.hOFElement
+          img(src='/images/icons/date.png', title='date')
       div#hoFMatchScreen
         each duo , index in data
-          div#oneHOFMatch
-            p#hOFElement
-              a(href='/profil/' + duo.player1)= duo.player1
-            p#hOFElement
-              a(href='/profil/' + duo.player2)= duo.player2
-            p#hOFElement=duo.score
-            p#hOFElement=duo.victory
-            p#hOFElement=duo.time
-            p#hOFElement=duo.date
+          if index === 0
+            div.containerIconRank
+              img(src='/images/icons/rank.png', title='première place', class='iconRank')
+          if index === 1
+            div.containerIconRank
+              img(src='/images/icons/rank.png', title='deuxième place', class='iconRank')
+          if index === 2
+            div.containerIconRank
+              img(src='/images/icons/rank.png', title='troisième place', class='iconRank')
+          div.oneHOFMatch
+            div.profilStats
+              p.hOFElement
+                a(href='/profil/' + duo.player1)= duo.player1
+              p.hOFElement
+                a(href='/profil/' + duo.player2)= duo.player2
+              p.hOFElement=duo.score
+              p.hOFElement=duo.victory
+              p.hOFElement=duo.time
+              p.hOFElement=duo.date
   include includes/footer.pug
