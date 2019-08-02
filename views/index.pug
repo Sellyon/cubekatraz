@@ -19,6 +19,22 @@ html
       max-width: 1000px;
       position: relative;
       margin: auto;
+      display: inline-block;
+    }
+    #asideLeftComments{
+      display: inline-block;
+      float: left;
+      text-align: center;
+      padding : 15px;
+      width : 25%;
+    }
+    #asideRightComments
+    {
+      display: inline-block;
+      float: right;
+      text-align: center;
+      padding : 15px;
+      width : 25%;
     }
     /* Caption text */
     .text {
@@ -117,6 +133,11 @@ html
       p
         | Saurez-vous en sortir indemne ?
       button#indexButton(name='button') JOUER
+    div#asideLeftComments
+      h2 I'll be back !!
+      p videoJeux.com
+      h2 Pouce bleu !
+      p Tutube
     .slideshow-container
       .mySlides.fade
         .numbertext 1 / 4
@@ -134,6 +155,9 @@ html
         .numbertext 4 / 4
         img(src='/images/gameplayCaptures/picture4.jpg')
         .text Du danger !
+    div#asideRightComments
+      h2 Dans un monde factice et sans originalité, cubekatraz offre une expérience unique et inoubliable
+      p Parimis Hotel
     br
     div(style='text-align:center')
       span.dotSlide
