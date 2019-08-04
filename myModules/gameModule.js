@@ -1,7 +1,7 @@
 const path = require('path');
 const MongoClient = require('mongodb').MongoClient;
 const client = require(path.join(__dirname, '/../dbs/db.js'));
-const uri = "mongodb+srv://yoannmroz:Ech1ariandre@cluster0-bznsv.mongodb.net/test?retryWrites=true&w=majority";
+const uri = "mongodb+srv://yoannmroz:ChristopheMonGodetBLOL@cluster0-bznsv.mongodb.net/test?retryWrites=true&w=majority";
 var myDB;
 const lobbyMod = require(__dirname + '/lobbyModule.js');
 const level1 = require(__dirname + '/level1.js');
@@ -14,7 +14,7 @@ const level7 = require(__dirname + '/level7.js');
 const level8 = require(__dirname + '/level8.js');
 const level9 = require(__dirname + '/level9.js');
 const level10 = require(__dirname + '/level10.js');
-const levelList = [level1, level2, level3, level4, level5, level6, level7, level8, level9, level10];
+const levelList = [level2];
 
 const testCollisions = function (obj1, obj2, vecteurX, vecteurY) {
   let collisionDetected = false;
@@ -380,32 +380,31 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
         myDB.collection('matchs').insertOne(newMatch, function(err, insertRes) {
           if (err) throw err;
           console.log("1 match inserted");
-        });
-        collection = myDB.collection('users');
-        collection.find({name: instance.player1Name}).toArray(function(err, data){
-          if (err) throw err;
-          if (data[0] !== undefined){
-            if (instance.player1Score > data[0].bestScore) {
+          collection = myDB.collection('users');
+          collection.find({name: instance.player1Name}).toArray(function(err, data){
+            if (err) throw err;
+            if (data[0] !== undefined){
+              if (instance.player1Score > data[0].bestScore) {
+                collection.update(
+                  {name: instance.player1Name},
+                  { $set: { bestScore: instance.player1Score } },
+                )
+              }
               collection.update(
                 {name: instance.player1Name},
-                { $set: { bestScore: instance.player1Score } },
+                { $set: { matchPlayed: data[0].matchPlayed+1 } },
               )
-            }
-            collection.update(
-              {name: instance.player1Name},
-              { $set: { matchPlayed: data[0].matchPlayed+1 } },
-            )
-            collection.update(
-              {name: instance.player1Name},
-              { $set: { gameFinished: data[0].gameFinished+1 } },
-            )
-            if (instance.elapsedTime < data[0].bestTime || data[0].bestTime === 0) {
               collection.update(
                 {name: instance.player1Name},
-                { $set: { bestTime: instance.elapsedTime } },
+                { $set: { gameFinished: data[0].gameFinished+1 } },
               )
+              if (instance.elapsedTime < data[0].bestTime || data[0].bestTime === 0) {
+                collection.update(
+                  {name: instance.player1Name},
+                  { $set: { bestTime: instance.elapsedTime } },
+                )
+              }
             }
-          }
         });
         collection.find({name: instance.player2Name}).toArray(function(err, data){
           if (err) throw err;
@@ -432,6 +431,7 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
             }
             //client.close();
           }
+        });
         });
       });
     }

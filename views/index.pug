@@ -5,6 +5,7 @@ html
     }
     body {
       font-family: Verdana, sans-serif;
+      background: linear-gradient(0deg,#48362c 25%,#dbbb87 48%);
     }
     .mySlides {
       display: none;
@@ -21,11 +22,26 @@ html
       margin: auto;
       display: inline-block;
     }
+    .indexComment{
+      background-color: rgba(255,255,255,0.75);
+      margin-top: 10px;
+      margin-bottom: 10px;
+      padding : 15px;
+    }
+    .commentLeft{
+      border-radius: 0px 10px 10px 0px;
+    }
+    .commentRight{
+      border-radius: 10px 0px 0px 10px;
+    }
+    .indexComment > h2 {
+      font-style: oblique;
+      font-size: 18px;
+    }
     #asideLeftComments{
       display: inline-block;
       float: left;
       text-align: center;
-      padding : 15px;
       width : 25%;
     }
     #asideRightComments
@@ -33,8 +49,10 @@ html
       display: inline-block;
       float: right;
       text-align: center;
-      padding : 15px;
       width : 25%;
+    }
+    #indexWrapper{
+      margin-bottom: 10px;
     }
     /* Caption text */
     .text {
@@ -123,45 +141,49 @@ html
     include includes/head.pug
   body
     include includes/navigation.pug
-    div#main.indexPitch
-      h1#welcomingMsg
-        | Bienvenue 
-        a= message
-        |  dans la prison de Cubekatraz !
-      p
-        | Cubekatraz est un jeu de coopération online qui met deux joueurs dans la peau de deux cubes intrépides bien décidés à s'échapper de la plus impitoyable des prisons qui soit : Cubekatraz !
-      p
-        | Saurez-vous en sortir indemne ?
-      button#indexButton(name='button') JOUER
-    div#asideLeftComments
-      h2 I'll be back !!
-      p videoJeux.com
-      h2 Pouce bleu !
-      p Tutube
-    .slideshow-container
-      .mySlides.fade
-        .numbertext 1 / 4
-        img(src='/images/gameplayCaptures/picture1.jpg', color = "black")
-        .text De l'amitié
-      .mySlides.fade
-        .numbertext 2 / 4
-        img(src='/images/gameplayCaptures/picture2.jpg')
-        .text Du mystère...
-      .mySlides.fade
-        .numbertext 3 / 4
-        img(src='/images/gameplayCaptures/picture3.jpg')
-        .text De la réflexion
-      .mySlides.fade
-        .numbertext 4 / 4
-        img(src='/images/gameplayCaptures/picture4.jpg')
-        .text Du danger !
-    div#asideRightComments
-      h2 Dans un monde factice et sans originalité, cubekatraz offre une expérience unique et inoubliable
-      p Parimis Hotel
-    br
-    div(style='text-align:center')
-      span.dotSlide
-      span.dotSlide
-      span.dotSlide
-      span.dotSlide
+    div#indexWrapper
+      div#main.indexPitch
+        h1#welcomingMsg
+          | Bienvenue 
+          a= message
+          |  dans la prison de Cubekatraz !
+        p
+          | Cubekatraz est un jeu de coopération online qui met deux joueurs dans la peau de deux cubes intrépides bien décidés à s'échapper de la plus impitoyable des prisons qui soit : Cubekatraz !
+        p
+          | Saurez-vous en sortir indemne ?
+        button#indexButton(name='button') JOUER
+      div#asideLeftComments
+        div.indexComment.commentLeft
+          h2 "I'll be back !!"
+          p videoJeux.com
+        div.indexComment.commentLeft
+          h2 "Pouce bleu !"
+          p tutuyau.com
+        div.indexComment.commentLeft
+          h2 "Cinq étoiles"
+          p Michelin
+      .slideshow-container
+        .mySlides.fade
+          img(src='/images/gameplayCaptures/picture1.jpg', color = "black")
+          .text De l'amitié
+        .mySlides.fade
+          img(src='/images/gameplayCaptures/picture2.jpg')
+          .text Du mystère...
+        .mySlides.fade
+          img(src='/images/gameplayCaptures/picture3.jpg')
+          .text De la réflexion
+        .mySlides.fade
+          img(src='/images/gameplayCaptures/picture4.jpg')
+          .text Du danger !
+      div#asideRightComments
+        div.indexComment.commentRight
+          h2 "Dans un monde factice et sans originalité, cubekatraz offre une expérience unique et inoubliable"
+          p Parimis Hotel
+        div.indexComment.commentRight
+          h2 "Ce jeu m'a mis sur le cul !"
+          p Julien Chaise, youtubeur
+    span.dotSlide
+    span.dotSlide
+    span.dotSlide
+    span.dotSlide
   include includes/footer.pug

@@ -54,36 +54,42 @@ router.post('/', function(req, res) {
 		let login = req.body.user_login;
 		let password = req.body.user_password;
 
-		collection.find({name: login}).toArray(function(err, data){
-			if (err) throw err;
-			if (data[0] === undefined){
-				req.session.user = login;
-				let newUser = { 
-					name: login,
-					password: password,
-					grade: 1,
-					description: '',
-					avatar: 'placeholderAvatar.png',
-					friends: [],
-					matchPlayed: 0,
-					bestScore: 0,
-					gameFinished: 0,
-					bestTime: 0
-				}
-				myDB.collection('users').insertOne(newUser, function(err, insertRes) {
-					if (err) throw err;
-					console.log("1 document inserted");
+		if (login !== '') {
+			collection.find({name: login}).toArray(function(err, data){
+				if (err) throw err;
+				if (data[0] === undefined){
 					req.session.user = login;
-					message = 'enregistrement réussie ' + routMod.getUserName(req) + ', bienvenu à Cubekatraz :)';
-					res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message, avatar: getAvatar(req)});
-					client.close();
-				});
-			} else {
-			  	message = 'Ce pseudo est déjà utilisé, choisis-en un autre.';
-			  	res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message, avatar: getAvatar(req)});
-			  	client.close();
-			}
-		});
+					let newUser = { 
+						name: login,
+						password: password,
+						grade: 1,
+						description: '',
+						avatar: 'placeholderAvatar.png',
+						friends: [],
+						matchPlayed: 0,
+						bestScore: 0,
+						gameFinished: 0,
+						bestTime: 0
+					}
+					myDB.collection('users').insertOne(newUser, function(err, insertRes) {
+						if (err) throw err;
+						console.log("1 document inserted");
+						req.session.user = login;
+						message = 'enregistrement réussie ' + routMod.getUserName(req) + ', bienvenu à Cubekatraz :)';
+						res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message, avatar: getAvatar(req)});
+						client.close();
+					});
+				} else {
+				  	message = 'Ce pseudo est déjà utilisé, choisis-en un autre.';
+				  	res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message, avatar: getAvatar(req)});
+				  	client.close();
+				}
+			});
+		} else {
+		 	message = 'Ce pseudo est pourri, choisis-en un autre.';
+		  	res.render('register', { profil: routMod.getUserName(req), title: 'login', message: message, avatar: getAvatar(req)});
+		  	client.close();
+		}
 	});
 })
 

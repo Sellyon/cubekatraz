@@ -11,25 +11,28 @@ window.document.addEventListener('DOMContentLoaded', function () {
 	var cancelEditDescription = document.getElementById('cancelEditDescription');
 	var description = document.getElementById('description');
 	var profilPresentation = document.getElementById('profilPresentation');
+	var iconAddFriend = document.getElementById('iconAddFriend');
 
-	var rawProfil = /\Wprofil\W.+/i.exec(window.location.href)[0];
-	var profilConsulted = rawProfil.substr(8, rawProfil.length)
 	iconEditDescription.style.display = 'none';
 	iconEditAvatar.style.display = 'none';
+	
+	if (hideIcon === 'true') {
+		iconAddFriend.style.display = 'none';
+	}
 
 	profilPresentation.addEventListener('mouseover', function (event) {
-		if (profilConsulted === profil) {
+		if (consultedProfile === profil) {
 			iconEditDescription.style.display = 'initial';
 		}
 	});
 
 	profilPresentation.addEventListener('mouseleave', function (event) {
-		if (profilConsulted === profil) {
+		if (consultedProfile === profil) {
 			iconEditDescription.style.display = 'none';
 		}
 	});
 
-
+	// Modify description request method post
 	iconEditDescription.addEventListener('click', function (event) {
 		iconEditDescription.style.display = 'none';
 		description.style.display = 'none';

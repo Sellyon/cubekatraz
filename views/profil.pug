@@ -3,6 +3,8 @@ html
   body
     script.
       var profil = '!{profil}';
+      var consultedProfile = '!{consultedProfile}';
+      var hideIcon = '!{hideIcon}';
     script(type='text/javascript', src='/js/profil.js')
     include includes/navigation.pug
     div#profilBackGround
@@ -26,27 +28,55 @@ html
 
           div#statsAndFriends
             div#profilStats
-              h2
-                | Observations
-              div#statsIcons
-                div
-                  img(src='/images/icons/score.png', title='meilleur score')
-                div
-                  img(src='/images/icons/coop.png', title='parties effectuées')
-                div
-                  img(src='/images/icons/victories.png', title='parties victorieuses')
-                div
-                  img(src='/images/icons/chrono.png', title='meilleur chrono')
-              div#statsValues
-                p= bestScore
-                p= matchPlayed
-                p= gameFinished
-                p= bestTime
+              div 
+                h2
+                  | Observations
+                div#statsIcons
+                  div
+                    img(src='/images/icons/score.png', title='meilleur score')
+                  div
+                    img(src='/images/icons/coop.png', title='parties effectuées')
+                  div
+                    img(src='/images/icons/victories.png', title='parties victorieuses')
+                  div
+                    img(src='/images/icons/chrono.png', title='meilleur chrono')
+                div#statsValues
+                  p= bestScore
+                  p= matchPlayed
+                  p= gameFinished
+                  p= bestTime
+              div
+                h2 Trophées
+                p (en cours de développement)
             div#ProfilFriends
-              h2
-                | Amis :
-              ul
-                each friend , index in friends
-                  li
-                    a(href='/profil/' + friend)= friend
+              div
+                h2
+                  | Amis :
+                form(action='/profil/' + consultedProfile, method='post')
+                  input#hiddenField(type='text',name='addFriend', value=consultedProfile) 
+                  input#iconAddFriend(type='image', alt="Submit", src='/images/icons/addFriend.png', class='edit', title='ajouter ' + consultedProfile + ' en ami')
+                ul
+                  each friend , index in friends
+                    li
+                      a(href='/profil/' + friend)= friend
+              if profil === consultedProfile
+                div
+                  h2 Envoyées :
+                  p Vos demandes envoyées en attente de réponse
+                  ul
+                    each friendYouRequest , index in friendsYouRequest
+                      li
+                        form(action='/profil/' + consultedProfile, method='post')
+                          a(href='/profil/' + friendYouRequest)= friendYouRequest
+                          button#cancelAddFriend(name='cancelRequestSent', value=friendYouRequest) annuler
+                div
+                  h2 Reçues :
+                  p Les demandes reçues en attente de votre réponse
+                  ul
+                    each requestForYou , index in requestYouForFriend
+                      li
+                        form(action='/profil/' + consultedProfile, method='post')
+                          a(href='/profil/' + requestForYou)= requestForYou
+                          button#refuseRequestFriend(name='refuseRecievedRequest', type='submit', value=requestForYou) annuler
+                          button#acceptRequestFriend(name='acceptRecievedRequest', type='submit', value=requestForYou) accepter
   include includes/footer.pug

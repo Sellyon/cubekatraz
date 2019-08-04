@@ -197,6 +197,7 @@ button:hover{
 	padding-right: 5;
 	padding-top: 1;
 	padding-bottom: 1;
+	overflow-wrap: break-word;
 }
 
 #lobbyConnectedPlayers {
@@ -414,7 +415,9 @@ button:hover{
 	display: inline-block;
 	padding-right: 10px;
 	width: 50%;
-	border-right: 1px solid black;
+}
+#profilStats > div{
+	margin-bottom : 15px;
 }
 #profilDetails{
     width: 55%;
@@ -432,7 +435,6 @@ button:hover{
 	width: 50%
 	margin: 15px;
 	text-align: left;
-	/*background-color: #f2e5c6;*/
 	box-sizing: border-box;
 	padding: 10px;
 }
@@ -455,9 +457,29 @@ button:hover{
 	padding-left: 10px;
 	padding-right: 10px;
 	box-sizing: border-box;
+	border-left: 1px solid black;
 }
-#profilFriends > ul{
+#profilFriends > div{
+	margin-bottom: 15px;
+}
+#profilFriends > div > p{
+	font-size: 12px;
+}
+#profilFriends > div > ul{
 	list-style: none;
+}
+#profilFriends > div > ul > li >  form:hover{
+	background-color: rgba(255,255,255,0.5);
+	transition: all 0.5s ease-out;
+}
+#profilFriends > div > ul > li {
+	margin-bottom: 5px;
+}
+#profilFriends > div > ul > li > form > button{
+	width: 50px;
+	font-size: 12px;
+	height: 20px;
+	float: right;
 }
 #statsIcons{
 	margin-bottom: 5px;
@@ -478,6 +500,11 @@ button:hover{
 	position: relative;
 	z-index: 1;
 }
+#iconAddFriend{
+	float: right;
+    position: relative;
+    top: -35px;
+}
 #statsValues > *{
 	width: 25%;
 	box-sizing: border-box;
@@ -486,6 +513,9 @@ button:hover{
 }
 #statsAndFriends{
 	border-top: 1px solid black;
+}
+#hiddenField{
+	display: none;
 }
 .edit{
 	width: 40px;
