@@ -4,13 +4,29 @@ html
     block menu
       include includes/navigation.pug
     div#main
-      h1 Créer profil
-      form(action='/register' method='post')
-        label(for='login') Identifiant :
-        input#name(type='text' name='user_login')
-        label(for='password') Mot de passe :
-        input#surname(type='password' name='user_password')
-        button(type='submit') Envoyer le message
-
-        p= message
+      h1= message
+      if !connected
+        div.connectionForm
+          h2 Se connecter
+          form(action='/login' method='post')
+            div#connectIDField
+              label(for='login') Identifiant :
+              input#name(type='text' name='user_login')
+            div#connectPasswordField
+              label(for='password') Mot de passe :
+              input#surname(type='password' name='user_password')
+            button(type='submit') Connexion
+        div.connectionForm
+          h2 Créer profil
+          form(action='/register' method='post')
+            div#RegisterIDField
+              label(for='login') Identifiant :
+              input#name(type='text' name='user_login')
+            div#RegisterPasswordField
+              label(for='password') Mot de passe :
+              input#surname(type='password' name='user_password')
+            button(type='submit') Inscription
+      else
+        form(action='/login', method='post')
+          button(type='submit' name='user_disconnect' value='true') Se déconnecter
   include includes/footer.pug

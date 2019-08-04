@@ -6,7 +6,7 @@ html
     div#main
       h1= message
       if !connected
-        div#connectionForm
+        div.connectionForm
           h2 Se connecter
           form(action='/login' method='post')
             div#connectIDField
@@ -16,7 +16,7 @@ html
               label(for='password') Mot de passe :
               input#surname(type='password' name='user_password')
             button(type='submit') Connexion
-        div#connectionForm
+        div.connectionForm
           h2 Créer profil
           form(action='/register' method='post')
             div#RegisterIDField

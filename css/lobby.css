@@ -124,8 +124,25 @@ button:hover{
 	height: 100%;
 }
 
-#connectionForm{
-	margin-top: 25px;
+.connectionForm{
+	border: 2px solid black;
+	width: 300px;
+	margin: auto;
+	margin-top: 30px;
+	margin-bottom: 80px;
+}
+
+.connectionForm > h2{
+	position: relative;
+	top: -15px;
+	background-color: #EBC193;
+	width: 250px;
+	margin: auto;
+}
+
+.connectionForm > form > button{
+	position: relative;
+	top: 25px;
 }
 
 /**** Lobby ****/
@@ -558,6 +575,17 @@ button:hover{
 }
 /* FOOTER */
 
+#portfolioWrapper{
+	width: 90px;
+	height: 60px;
+	margin: auto;
+	padding-top: 30px;
+}
+
+#portfolioWrapper > a{
+	text-decoration: none;
+}
+
 footer {
     height: 160px;
     background-color: #48362c;
@@ -566,7 +594,6 @@ footer {
 footer h1 {
     color: white;
     text-align: center;
-    padding-top: 30px;
     font-family: 'Crete Round', serif;
     font-size: 45px;
     text-decoration: none;
