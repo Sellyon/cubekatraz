@@ -14,7 +14,7 @@ const level7 = require(__dirname + '/level7.js');
 const level8 = require(__dirname + '/level8.js');
 const level9 = require(__dirname + '/level9.js');
 const level10 = require(__dirname + '/level10.js');
-const levelList = [level2];
+const levelList = [level1, level2, level3, level4, level5, level6, level7, level8, level9, level10];
 
 const testCollisions = function (obj1, obj2, vecteurX, vecteurY) {
   let collisionDetected = false;
