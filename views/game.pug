@@ -8,15 +8,19 @@ html
 		div#disconnectionIssues
 			p#disconnectionText
 		div#infosInGame
-			h2#levelNumber
-			p#levelTitle
-			h2#player1NameInGame
-			p#player1ScoreInGame
-			p#player1DeathsInGame
-			h2#player2NameInGame
-			p#player2ScoreInGame
-			p#player2DeathsInGame
-			h2#elapsedTimeInGame
+			div#levelInfos
+				h2#levelNumber
+				p#levelTitle
+			div#player1Infos
+				h2#player1NameInGame
+				p#player1ScoreInGame
+				p#player1DeathsInGame
+			div#player2Infos
+				h2#player2NameInGame
+				p#player2ScoreInGame
+				p#player2DeathsInGame
+			div#elapsedTimeInfos
+				h2#elapsedTimeInGame
 		div#canvasAndButton
 			canvas#canvas Votre navigateur ne supporte pas HTML5, veuillez le mettre &agrave; jour pour jouer.
 			button#victoryButton(name='button') HOURRA !
