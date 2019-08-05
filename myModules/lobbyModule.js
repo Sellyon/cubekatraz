@@ -162,6 +162,8 @@ const setUpInstance = function (instancesList, avatarSlot1, avatarSlot2) {
     player1isDead: false,
     player1Disconnected: false,
     player1Avatar: exports.getCubeAvatar(avatarSlot1.image),
+    player1Emoticon: 0,
+    player1EmoticonCounter: 0,
     player1Score: 0,
     player1Deaths: 0,
     player2Id: avatarSlot2.status,
@@ -172,6 +174,8 @@ const setUpInstance = function (instancesList, avatarSlot1, avatarSlot2) {
     player2Disconnected: false,
     disconnectionTimer: 750, // 750*40 = 30 000 ms
     player2Avatar: exports.getCubeAvatar(avatarSlot2.image),
+    player2Emoticon: 0,
+    player2EmoticonCounter: 0,
     player2Score: 0,
     player2Deaths: 0,
     level: 1,
@@ -205,7 +209,7 @@ exports.initiateEvasionCountDown = function (serverSocketIO, countDownStarted, c
         clearInterval(countDownInterval);
         countDownForbidden = false;
         countDownStarted = false;
-        if (countDownValue <= 0) {
+        if (countDownValue <= 0 && avatarSlot1.name !== 'vide' && avatarSlot2.name !== 'vide') {
           let instanceIndex = setUpInstance(instancesList, avatarSlot1, avatarSlot2);
           // Settings for created instance
           instancesList[instanceIndex].rules = gameMod.instanceGenerator(serverSocketIO, instanceIndex, instancesList);
@@ -219,6 +223,8 @@ exports.initiateEvasionCountDown = function (serverSocketIO, countDownStarted, c
             player2: avatarSlot2.name
           });
           console.log('instance creation : ' + (instanceIndex + 1));
+        } else if (countDownForbidden) {
+          countDownValue = 0;
         }
       } else {
         serverSocketIO.emit('updateEvasionCountDownBack', countDownText);

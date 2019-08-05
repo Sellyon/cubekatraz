@@ -147,6 +147,9 @@ serverSocketIO.on('connection', function (socket) {
 	            if (lobbyMod.getHandshakeId(socket) === playerList[i].id) {
 	            	playerList.splice(i, 1);
 	            	i = playerList.length;
+	            	if (countDownStarted) {
+	            		countDownForbidden = true;
+	            	}
 	            }
 			}
 			serverSocketIO.emit('updateConnectedList', playerList);
@@ -159,6 +162,9 @@ serverSocketIO.on('connection', function (socket) {
 			if (lobbyMod.getHandshakeId(socket) === avatarSlot1.status || lobbyMod.getHandshakeId(socket) === avatarSlot2.status) {
 				serverSocketIO.emit('userLeaveAntichamber', lobbyMod.emptySlot (socket, playerList, avatarSlot1, avatarSlot2));
 				socket.emit('updateAntichamberAdderText', 'Rejoindre la partie');
+				if (countDownStarted) {
+	            	countDownForbidden = true;
+	            }
 
 			// The player wants to join a slot, so we test if there is a slot available or not
 			} else if (lobbyMod.getHandshakeId(socket) !== avatarSlot1.status && lobbyMod.getHandshakeId(socket) !== avatarSlot2.status && (avatarSlot1.status === 'empty' || avatarSlot2.status === 'empty')) {
@@ -267,6 +273,9 @@ serverSocketIO.on('connection', function (socket) {
 			// Here we collect players inputs
 			socket.on('playerMove', function (moves) {
 				gameMod.updatePlayerMoves(socket, instancesList, moves, instanceRegex);
+			});
+			socket.on('showEmoticon', function (emoticon) {
+				gameMod.showEmoticon(serverSocketIO, instanceRequired - 1, socket, instancesList, emoticon, instanceRegex);
 			});
 			// if a player is reconnected in a room, we update instance settings
 			if (lobbyMod.getHandshakeId(socket) === instancesList[instanceRequired - 1].player1Id) {

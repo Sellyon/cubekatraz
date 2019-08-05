@@ -343,6 +343,18 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
       }
 
       instance.elapsedTime ++;
+      if(instance.player1EmoticonCounter > 0) {
+        instance.player1EmoticonCounter--;
+        if(instance.player1EmoticonCounter === 0) {
+          instance.player1Emoticon = 0;
+        }
+      }
+      if(instance.player2EmoticonCounter > 0) {
+        instance.player2EmoticonCounter--;
+        if(instance.player2EmoticonCounter === 0) {
+          instance.player2Emoticon = 0;
+        }
+      }
     }
 
     // disconnection management
@@ -464,6 +476,29 @@ exports.updatePlayerMoves = function (socket, instancesList, moves, instanceRege
     if (moves.movingRight === true || moves.movingRight === false) {
       player.movingRight = moves.movingRight;
     }
+  }
+}
+
+exports.showEmoticon = function (serverSocketIO, instanceNumber, socket, instancesList, emoticon, instanceRegex) {
+  let instanceRequired = instanceRegex.exec(socket.handshake.headers.referer);
+  let player;
+  let playerIsDead;
+  if (lobbyMod.getHandshakeId(socket) === instancesList[instanceRequired - 1].player1Id) {
+    player = instancesList[instanceRequired - 1].rules.player1;
+    playerIsDead = instancesList[instanceRequired - 1].player1isDead;
+    if (player && !playerIsDead) {
+      instancesList[instanceRequired - 1].player1EmoticonCounter = 75;
+      instancesList[instanceRequired - 1].player1Emoticon = emoticon;
+    }
+  } else if (lobbyMod.getHandshakeId(socket) === instancesList[instanceRequired - 1].player2Id) {
+    player = instancesList[instanceRequired - 1].rules.player2;
+    playerIsDead = instancesList[instanceRequired - 1].player2isDead;
+    if (player && !playerIsDead) {
+      instancesList[instanceRequired - 1].player2EmoticonCounter = 75;
+      instancesList[instanceRequired - 1].player2Emoticon = emoticon;
+    }
+  } else {
+    return false
   }
 }
 

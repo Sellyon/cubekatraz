@@ -31,6 +31,8 @@ window.document.addEventListener('DOMContentLoaded', function () {
 		var player2Deaths;
 		var player1Name;
 		var player2Name;
+		var player1Emoticon;
+		var	player2Emoticon;
 
 		var levelNumber = document.getElementById('levelNumber');
 		var levelTitle = document.getElementById('levelTitle');
@@ -44,7 +46,60 @@ window.document.addEventListener('DOMContentLoaded', function () {
 		var disconnectionIssues = document.getElementById('disconnectionIssues');
 		var disconnectionText = document.getElementById('disconnectionText');
 		var victoryButton = document.getElementById('victoryButton');
+		var emoticonHi = document.getElementById('emoticonHi');
+		var emoticonCongratulations = document.getElementById('emoticonCongratulations');
+		var emoticonFear = document.getElementById('emoticonFear');
+		var emoticonLol = document.getElementById('emoticonLol');
+		var emoticonHere = document.getElementById('emoticonHere');
+		var emoticonWait = document.getElementById('emoticonWait');
+		var emoticonSpeedUp = document.getElementById('emoticonSpeedUp');
+		var emoticonThinking = document.getElementById('emoticonThinking');
 
+		// Emoticons images list
+		var emoticonHiImage = new Image();
+		emoticonHiImage.src = '/images/emoticons/hi.png';
+		var emoticonCongratulationsImage = new Image();
+		emoticonCongratulationsImage.src = '/images/emoticons/congratulations.png';
+		var emoticonFearImage = new Image();
+		emoticonFearImage.src = '/images/emoticons/fear.png';
+		var emoticonLolImage = new Image();
+		emoticonLolImage.src = '/images/emoticons/lol.png';
+		var emoticonHereImage = new Image();
+		emoticonHereImage.src = '/images/emoticons/here.png';
+		var emoticonWaitImage = new Image();
+		emoticonWaitImage.src = '/images/emoticons/wait.png';
+		var emoticonSpeedUpImage = new Image();
+		emoticonSpeedUpImage.src = '/images/emoticons/speedUp.png';
+		var emoticonThinkingImage = new Image();
+		emoticonThinkingImage.src = '/images/emoticons/thinking.png';
+
+		// Emoticons send requests
+		emoticonHi.addEventListener('click', function (evt) {
+         	socket.emit('showEmoticon', 1);
+        });
+        emoticonCongratulations.addEventListener('click', function (evt) {
+         	socket.emit('showEmoticon', 2);
+        });
+        emoticonFear.addEventListener('click', function (evt) {
+         	socket.emit('showEmoticon', 3);
+        });
+        emoticonLol.addEventListener('click', function (evt) {
+         	socket.emit('showEmoticon', 4);
+        });
+        emoticonHere.addEventListener('click', function (evt) {
+         	socket.emit('showEmoticon', 5);
+        });
+        emoticonWait.addEventListener('click', function (evt) {
+         	socket.emit('showEmoticon', 6);
+        });
+        emoticonSpeedUp.addEventListener('click', function (evt) {
+         	socket.emit('showEmoticon', 7);
+        });
+        emoticonThinking.addEventListener('click', function (evt) {
+         	socket.emit('showEmoticon', 8);
+        });
+
+		// Inputs for moving management
 		window.onkeydown = function(event) {
 			var e = event || window.event;
 			var key = e.which || e.keyCode;
@@ -128,6 +183,7 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			}
 		}
 
+		// Victory button : only available when game is finished
 		victoryButton.addEventListener('click', function (evt) {
           evt.preventDefault();
           window.location.href = '/hallOfFame';
@@ -148,6 +204,8 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			player2Deaths = data.player2Deaths;
 			player1Name = data.player1Name;
 			player2Name = data.player2Name;
+			player1Emoticon = data.player1Emoticon;
+			player2Emoticon = data.player2Emoticon;
 
 			// UPDATE TEXTS
 			// update level title
@@ -240,19 +298,63 @@ window.document.addEventListener('DOMContentLoaded', function () {
 				var avatar;
 				var player;
 				var playerOpacity;
+				var playerEmoticon;
+				var emoticonImage;
 				for (var i = 0; i < 2; i++) {
 					if (i === 0) {
 						avatar = data.player1Avatar;
 						player = player1;
 						playerOpacity = data.player1Opacity;
+						playerEmoticon = player1Emoticon;
 					} else {
 						avatar = data.player2Avatar;
 						player = player2;
 						playerOpacity = data.player2Opacity;
+						playerEmoticon = player2Emoticon;
 					}
 					for (var j = 0; j < avatar.length; j++) {
 						context.fillStyle = 'rgba(' + avatar[j].color[0] + ',' + avatar[j].color[1] + ',' + avatar[j].color[2] + ',' + playerOpacity + ')';
 						context.fillRect(player.x + avatar[j].x, player.y + avatar[j].y, avatar[j].width, avatar[j].height);
+					}
+
+					// draw emoticons
+					if (playerEmoticon > 0) {
+						switch(playerEmoticon) {
+							case 1 : // Emoticon 'Hi !'
+								emoticonImage = emoticonHiImage;
+								break;
+
+							case 2 : // Emoticon 'Hourra !'
+								emoticonImage = emoticonCongratulationsImage;
+								break;
+
+							case 3 : // Emoticon 'J\'ai peur'
+								emoticonImage = emoticonFearImage;
+								break;
+								
+							case 4 : // Emoticon 'lol'
+								emoticonImage = emoticonLolImage;
+								break;
+
+							case 5 : // Emoticon 'Viens ici !'
+								emoticonImage = emoticonHereImage;
+								break;
+
+							case 6 : // Emoticon 'Attends ici !'
+								emoticonImage = emoticonWaitImage;
+								break;
+								
+							case 7 : // Emoticon 'On se dépêche !'
+								emoticonImage = emoticonSpeedUpImage;
+								break;
+								
+							case 8 : // Emoticon 'Je réfléchis'
+								emoticonImage = emoticonThinkingImage;
+								break;
+						}
+						
+
+						context.drawImage(emoticonImage, player.x, player.y, 50, 50);
 					}
 				}
 
