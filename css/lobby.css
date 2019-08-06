@@ -322,10 +322,15 @@ button:hover{
 
 #evasionCountDown {
 	font-family: 'Special Elite', cursive;
-	font-size: 10em;
+	font-size: 200px;
 	position: absolute;
-	left: calc(50vw - 50px);
-	top: calc(50vh - 50px);
+	left: calc(50vw - 100px);
+	top: calc(50vh - 100px);
+	background-color: rgba(255,255,255,0.75);
+	height: 200px;
+	width: 200px;
+	border-radius: 70px;
+	display: none;
 }
 
 /* Hall of fame */

@@ -204,12 +204,18 @@ exports.initiateEvasionCountDown = function (serverSocketIO, countDownStarted, c
 
     let countDownInterval = setInterval(function () {
       countDownText = Math.round(countDownValue * 40 / 1000);
-      if (countDownValue <= 0 || countDownForbidden) {
+      if (avatarSlot1.name === 'vide' || avatarSlot2.name === 'vide' || countDownForbidden) {
+        clearInterval(countDownInterval);
+        countDownValue = 0;
+        countDownForbidden = false;
+        countDownStarted = false;
+        serverSocketIO.emit('EvasionCountDownBackFinished');
+      } else if (countDownValue <= 0) {
         serverSocketIO.emit('EvasionCountDownBackFinished');
         clearInterval(countDownInterval);
         countDownForbidden = false;
         countDownStarted = false;
-        if (countDownValue <= 0 && avatarSlot1.name !== 'vide' && avatarSlot2.name !== 'vide') {
+        if (countDownValue <= 0) {
           let instanceIndex = setUpInstance(instancesList, avatarSlot1, avatarSlot2);
           // Settings for created instance
           instancesList[instanceIndex].rules = gameMod.instanceGenerator(serverSocketIO, instanceIndex, instancesList);
@@ -223,8 +229,6 @@ exports.initiateEvasionCountDown = function (serverSocketIO, countDownStarted, c
             player2: avatarSlot2.name
           });
           console.log('instance creation : ' + (instanceIndex + 1));
-        } else if (countDownForbidden) {
-          countDownValue = 0;
         }
       } else {
         serverSocketIO.emit('updateEvasionCountDownBack', countDownText);
