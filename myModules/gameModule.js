@@ -14,6 +14,7 @@ const level7 = require(__dirname + '/level7.js');
 const level8 = require(__dirname + '/level8.js');
 const level9 = require(__dirname + '/level9.js');
 const level10 = require(__dirname + '/level10.js');
+//const levelList = [level2];
 const levelList = [level1, level2, level3, level4, level5, level6, level7, level8, level9, level10];
 
 const testCollisions = function (obj1, obj2, vecteurX, vecteurY) {
@@ -391,59 +392,111 @@ exports.mainLoop = function (serverSocketIO, instanceNumber, instancesList) {
         let collection = myDB.collection('matchs');
         myDB.collection('matchs').insertOne(newMatch, function(err, insertRes) {
           if (err) throw err;
+          console.log(insertRes.insertedId); //Here is the Id of the match !! useful to redirect the user to his match when he will click on "hourra !" button
           console.log("1 match inserted");
           collection = myDB.collection('users');
-          collection.find({name: instance.player1Name}).toArray(function(err, data){
-            if (err) throw err;
-            if (data[0] !== undefined){
-              if (instance.player1Score > data[0].bestScore) {
-                collection.update(
-                  {name: instance.player1Name},
-                  { $set: { bestScore: instance.player1Score } },
-                )
-              }
-              collection.update(
-                {name: instance.player1Name},
-                { $set: { matchPlayed: data[0].matchPlayed+1 } },
-              )
-              collection.update(
-                {name: instance.player1Name},
-                { $set: { gameFinished: data[0].gameFinished+1 } },
-              )
-              if (instance.elapsedTime < data[0].bestTime || data[0].bestTime === 0) {
-                collection.update(
-                  {name: instance.player1Name},
-                  { $set: { bestTime: instance.elapsedTime } },
-                )
-              }
-            }
-        });
-        collection.find({name: instance.player2Name}).toArray(function(err, data){
-          if (err) throw err;
-          if (data[0] !== undefined){
-            if (instance.player2Score > data[0].bestScore) {
-              collection.update(
-                {name: instance.player2Name},
-                { $set: { bestScore: instance.player2Score } },
-              )
-            }
-            collection.updateOne(
-              {name: instance.player2Name},
-              { $set: { matchPlayed: data[0].matchPlayed+1 } },
-            )
-            collection.updateOne(
-              {name: instance.player2Name},
-              { $set: { gameFinished: data[0].gameFinished+1 } },
-            )
-            if (instance.elapsedTime < data[0].bestTime || data[0].bestTime === 0) {
-              collection.updateOne(
-                {name: instance.player2Name},
-                { $set: { bestTime: instance.elapsedTime } },
-              )
-            }
-            //client.close();
+
+          const updateDBAfterMatch = function (instance) {
+            updateDBAfterMatch.findPlayer1(instance);
           }
-        });
+
+          updateDBAfterMatch.findPlayer1 = function(instance) {
+            collection.find({name: instance.player1Name}).toArray(function(err, data){
+              if (err) throw err;
+              if (data[0] !== undefined){
+                console.log('findPlayer1 fini');
+                if (instance.player1Score > data[0].bestScore) {
+                  updateDBAfterMatch.findPlayer1.updateScore(instance, data);
+                } else {
+                  updateDBAfterMatch.findPlayer1.updateMatchPlayed(instance, data);
+                }
+              }
+            });
+          }
+
+          updateDBAfterMatch.findPlayer1.updateScore = function(instance) {
+            collection.updateOne(
+              {name: instance.player1Name},
+              { $set: { bestScore: instance.player1Score } }, function(err,records){
+                console.log('updateScore1 fini');
+              updateDBAfterMatch.findPlayer1.updateMatchPlayed(instance, data);
+            });
+          }
+
+          updateDBAfterMatch.findPlayer1.updateMatchPlayed = function(instance, data) {
+            collection.updateOne(
+              {name: instance.player1Name},
+              { $set: { matchPlayed: data[0].matchPlayed+1, gameFinished: data[0].gameFinished+1 } }, function(err,records){
+                console.log('updateMatchPlayed1 fini');
+              if (instance.player1Score > data[0].bestScore) {
+                updateDBAfterMatch.findPlayer1.updateBestTime(instance, data);
+              } else {
+                updateDBAfterMatch.findPlayer2(instance, data);
+              }
+            });
+          }
+
+          updateDBAfterMatch.findPlayer1.updateBestTime = function(instance, data) {
+            collection.updateOne(
+              {name: instance.player1Name},
+              { $set: { bestTime: instance.elapsedTime } }, function(err,records){
+                console.log('updateBestTime1 fini');
+              updateDBAfterMatch.findPlayer2(instance, data);
+            });
+          }
+
+          updateDBAfterMatch.findPlayer2 = function(instance, data) {
+            collection.find({name: instance.player2Name}).toArray(function(err, data){
+              if (err) throw err;
+              if (data[0] !== undefined){
+                console.log('findPlayer2 fini');
+                if (instance.player2Score > data[0].bestScore) {
+                  updateDBAfterMatch.findPlayer2.updateScore(instance, data);
+                } else {
+                  updateDBAfterMatch.findPlayer2.updateMatchPlayed(instance, data);
+                }
+              }
+            });
+          }
+
+          updateDBAfterMatch.findPlayer2.updateScore = function(instance, data) {
+            collection.updateOne(
+              {name: instance.player2Name},
+              { $set: { bestScore: instance.player2Score } }, function(err,records){
+                console.log('updateScore2 fini');
+              updateDBAfterMatch.findPlayer2.updateMatchPlayed(instance, data);
+            });
+          }
+
+          updateDBAfterMatch.findPlayer2.updateMatchPlayed = function(instance, data) {
+            collection.updateOne(
+              {name: instance.player2Name},
+               { $set: { matchPlayed: data[0].matchPlayed+1, gameFinished: data[0].gameFinished+1 } }, function(err,records){
+                console.log('updateMatchPlayed2 fini');
+              if (instance.player2Score > data[0].bestScore) {
+                updateDBAfterMatch.findPlayer2.updateBestTime(instance, data);
+              } else {
+                updateDBAfterMatch.closeThis(instance);
+              }
+            });
+          }
+
+          updateDBAfterMatch.findPlayer2.updateBestTime = function(instance, data) {
+            collection.updateOne(
+              {name: instance.player2Name},
+              { $set: { bestTime: instance.elapsedTime } }, function(err,records){
+                console.log('updateBestTime2 fini');
+              updateDBAfterMatch.closeThis(instance);
+            });
+          }
+
+          updateDBAfterMatch.closeThis = function (instance) {
+            client.close();
+            serverSocketIO.to('room' + (instanceNumber + 1)).emit('showVictoryButton', instancesList[instanceNumber]);
+            console.log('update en BDD finie')
+          }
+
+          updateDBAfterMatch(instance);
         });
       });
     }

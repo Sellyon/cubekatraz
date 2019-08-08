@@ -168,6 +168,7 @@ button:hover{
 
 #lobbyContainer > *{
 	height: calc(100vh - 198px);
+	min-height: 550px;
 }
 #lobbySideLeft{
 	width: 15%;
@@ -293,6 +294,7 @@ button:hover{
 #slotPlayer1{
 	width: 40%;
 	display: inline-block;
+	margin-right: 10px;
 }
 
 #slotPlayer2{
@@ -322,13 +324,7 @@ button:hover{
 
 #evasionCountDown {
 	font-family: 'Special Elite', cursive;
-	font-size: 200px;
-	position: absolute;
-	left: calc(50vw - 100px);
-	top: calc(50vh - 100px);
-	background-color: rgba(255,255,255,0.75);
-	height: 200px;
-	width: 200px;
+	font-size: 150px;
 	border-radius: 70px;
 	display: none;
 }
@@ -739,5 +735,28 @@ footer h1:hover {
 	}
 	#infosInGame > div > p{
 		font-size: 14px;
+	}
+}
+
+/*profile*/
+
+@media screen and (max-width: 950px) {
+	#profilFriends{
+		display: block;
+		border-left: 0px;
+		border-top: 1px solid black;
+		width: 100%;
+		padding: 10px;
+	}
+	#profilStats{
+		width: 100%;
+	}
+}
+
+@media screen and (max-width: 850px) {
+	#profilDetails{
+		display: block;
+		margin-left: 0px;
+		width: 100%;
 	}
 }

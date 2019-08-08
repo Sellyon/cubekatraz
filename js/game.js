@@ -419,7 +419,9 @@ window.document.addEventListener('DOMContentLoaded', function () {
 			context.fillText('Score de ' + data.player2Name + ' : ' + data.player2Score, 250, 125);
 			context.fillText('Score total : ' + (data.player1Score +  data.player2Score), 250, 150);
 			context.fillText('Temps écoulé : ' + finalTime, 250, 175);
-			victoryButton.style.visibility = 'visible';
+			socket.addEventListener('showVictoryButton', function(data){
+				victoryButton.style.visibility = 'visible';
+			});
 		});
 	});
 });

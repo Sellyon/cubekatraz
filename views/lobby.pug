@@ -253,6 +253,23 @@ html
           evasionCountDown.style.display = "none";
         });
 
+        // switch image onmouseover/mouseleave
+        player1AvatarSelect.addEventListener('mouseover', function (evt) {
+          player1AvatarSelect.src = "/images/icons/changeWhite.png"
+        });
+
+        player2AvatarSelect.addEventListener('mouseover', function (evt) {
+          player2AvatarSelect.src = "/images/icons/changeWhite.png"
+        });
+
+        player1AvatarSelect.addEventListener('mouseleave', function (evt) {
+          player1AvatarSelect.src = "/images/icons/change.png"
+        });
+
+        player2AvatarSelect.addEventListener('mouseleave', function (evt) {
+          player2AvatarSelect.src = "/images/icons/change.png"
+        });
+
         // switch avatar
         player1AvatarSelect.addEventListener('click', function (evt) {
           evt.preventDefault();
@@ -301,16 +318,16 @@ html
             p
               | joueur 1 : 
               a#player1InAntichamber
-            button#player1AvatarSelect(name='button') >
+            input#player1AvatarSelect(type='image', src='/images/icons/change.png')
             img#avatarPlayer1(src='', alt='player 1 portrait' width=200 height= 200)
-          p#evasionCountDown
           div#slotPlayer2
             p
               | joueur 2 : 
               a#player2InAntichamber
-            button#player2AvatarSelect(name='button') >
             img#avatarPlayer2(src='', alt='player 2 portrait' width=200 height= 200)
+            input#player2AvatarSelect(type='image', src='/images/icons/change.png')
           p#antichamberStatus
+          p#evasionCountDown
       div#lobbyChat
         h2
           | Le réfectoire
