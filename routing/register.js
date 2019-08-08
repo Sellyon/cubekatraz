@@ -29,7 +29,7 @@ router.use(session({
 
 const getAvatar = function (req) {
 	if (req.session && req.session.avatar) {
-		return '/images/usersAvatars/' + req.session.avatar
+		return req.session.avatar
 	} else {
 		return '/images/usersAvatars/placeholderAvatar.png'
 	}
@@ -64,12 +64,15 @@ router.post('/', function(req, res) {
 						password: password,
 						grade: 1,
 						description: '',
-						avatar: 'placeholderAvatar.png',
+						avatar: '/images/usersAvatars/placeholderAvatar.png',
 						friends: [],
 						matchPlayed: 0,
 						bestScore: 0,
 						gameFinished: 0,
-						bestTime: 0
+						bestTime: 0,
+						achievements: [],
+						friendsYouRequest: [],
+						RequestYouForFriend: [],
 					}
 					myDB.collection('users').insertOne(newUser, function(err, insertRes) {
 						if (err) throw err;

@@ -8,7 +8,7 @@ var router = express.Router();
 
 const getAvatar = function (req) {
   if (req.session && req.session.avatar) {
-    return '/images/usersAvatars/' + req.session.avatar
+    return req.session.avatar
   } else {
     return '/images/usersAvatars/placeholderAvatar.png'
   }

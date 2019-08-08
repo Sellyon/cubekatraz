@@ -5,6 +5,7 @@ html
       var profil = '!{profil}';
       var consultedProfile = '!{consultedProfile}';
       var hideIcon = '!{hideIcon}';
+      var avatarProfil = '!{avatarProfil}'
     script(type='text/javascript', src='/js/profil.js')
     include includes/navigation.pug
     div#profilBackGround
@@ -13,11 +14,20 @@ html
           h1= titleprofil
           img(src=avatarProfil)
           input#iconEditAvatar(type='image', src='/images/icons/edit.svg', class='edit', title='modifier votre avatar')
+          div#changeAvatar
+            form#avatarForm(action='/profil/' + profil, method='post')
+              div
+                h2 Changer image de profil
+                p Déposez ici une url valide :
+                input#editAvatar(name='editAvatar', value=avatarProfil)
+                button(type='submit', value='envoyer') envoyer
+                button#cancelEditAvatar(name='button') annuler
+                h2 Aperçu :
+                img#avatarPreview(src=avatarProfil)
         div#profilDetails
           div#profilPresentation
             img#iconTrombone(src='/images/icons/trombone.png')
-            h2
-              | Dossier pénitentiaire
+            h2 Dossier pénitentiaire
             p#description= description
             form#descriptionForm(action='/profil/' + profil, method='post')
               div
@@ -29,8 +39,7 @@ html
           div#statsAndFriends
             div#profilStats
               div 
-                h2
-                  | Observations
+                h2 Observations
                 div#statsIcons
                   div
                     img(src='/images/icons/score.png', title='meilleur score')
@@ -50,8 +59,7 @@ html
                 p (en cours de développement)
             div#ProfilFriends
               div
-                h2
-                  | Amis :
+                h2 Amis (!{friends.length})
                 form(action='/profil/' + consultedProfile, method='post')
                   input#hiddenField(type='text',name='addFriend', value=consultedProfile) 
                   input#iconAddFriend(type='image', alt="Submit", src='/images/icons/addFriend.png', class='edit', title='ajouter ' + consultedProfile + ' en ami')
@@ -61,7 +69,7 @@ html
                       a(href='/profil/' + friend)= friend
               if profil === consultedProfile
                 div
-                  h2 Envoyées :
+                  h2 Envoyées (!{friendsYouRequest.length})
                   p Vos demandes envoyées en attente de réponse
                   ul
                     each friendYouRequest , index in friendsYouRequest
@@ -70,7 +78,7 @@ html
                           a(href='/profil/' + friendYouRequest)= friendYouRequest
                           button#cancelAddFriend(name='cancelRequestSent', value=friendYouRequest) annuler
                 div
-                  h2 Reçues :
+                  h2 Reçues (!{requestYouForFriend.length})
                   p Les demandes reçues en attente de votre réponse
                   ul
                     each requestForYou , index in requestYouForFriend

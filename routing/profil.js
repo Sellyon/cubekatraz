@@ -29,7 +29,7 @@ router.use(session({
 
 const getAvatar = function (req) {
 	if (req.session && req.session.avatar) {
-		return '/images/usersAvatars/' + req.session.avatar
+		return req.session.avatar
 	} else {
 		return '/images/usersAvatars/placeholderAvatar.png'
 	}
@@ -39,6 +39,15 @@ const editDescription = function (req, res, collection) {
 	collection.updateOne(
 		{name: req.params.profilName},
 		{ $set: { description: req.body.editDescription } }, function(err,records){
+			renderProfile(req, res);
+	});
+}
+
+const editAvatar = function (req, res, collection) {
+	collection.updateOne(
+		{name: req.params.profilName},
+		{ $set: { avatar: req.body.editAvatar } }, function(err,records){
+			req.session.avatar = req.body.editAvatar;
 			renderProfile(req, res);
 	});
 }
@@ -168,7 +177,7 @@ const renderProfile = function (req, res) {
 				matchPlayed: data[0].matchPlayed,
 				gameFinished: data[0].gameFinished,
 				bestTime: routMod.msToTime(data[0].bestTime*40),
-				avatarProfil: '/images/usersAvatars/' + data[0].avatar,
+				avatarProfil: data[0].avatar,
 				avatar: getAvatar(req),
 				connected: connected,
 				hideIcon: hideIcon
@@ -203,6 +212,10 @@ router.post('/:profilName', function(req, res) {
 		// If a request to modify description is done AND the user in session is the owner of the profile the request is accepted
 		if (req.params.profilName === userName && req.body.editDescription) {
 			editDescription (req, res, collection);
+		}
+		// If a request to modify avatar is done AND the user in session is the owner of the profile the request is accepted
+		if (req.params.profilName === userName && req.body.editAvatar) {
+			editAvatar (req, res, collection);
 		}
 		// If a request to add consulted profile is done AND the user in session is NOT the owner of the profile the request is accepted
 		else if (req.body.addFriend && userName !== req.body.addFriend) {
